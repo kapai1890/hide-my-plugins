@@ -6,7 +6,7 @@
  * Description: Allows to hide plugins from the plugins list.
  * Version: 18.15.1
  * Author: kapai1890
- * Author URI: https://github.com/kapai1890
+ * Author URI: https://github.com/kapai1890/
  * License: MIT
  * Text Domain: just-hide-plugins
  * Domain Path: /languages
@@ -54,7 +54,10 @@ final class HidePlugins
 
         register_activation_hook(__FILE__, [$this, 'onActivate']);
 
-        $this->addActions();
+        // No need to add actions on AJAX calls
+        if (!defined('DOING_AJAX') || !DOING_AJAX) {
+            $this->addActions();
+        }
     }
 
     private function addActions()
@@ -118,14 +121,14 @@ final class HidePlugins
         add_action('admin_action_just_show_plugin', [$this, 'onShowPlugin']);
 
         /**
-		 * Filters the list of available list table views.
-		 *
-		 * @requires WordPress 3.5.0
+         * Filters the list of available list table views.
+         *
+         * @requires WordPress 3.5.0
          *
          * @see https://developer.wordpress.org/reference/hooks/views_this-screen-id/
          * @see \WP_List_Table::views() in wp-admin/includes/class-wp-list-table.php
          */
-        add_filter('views_plugins', [$this, 'addCategoryHidden']);
+        add_filter('views_plugins', [$this, 'addHiddenPluginsTab']);
     }
 
     public function loadTranslations()
@@ -142,7 +145,7 @@ final class HidePlugins
     {
         $hidden = $this->getHiddenPlugins();
 
-        if ($this->isCategoryHidden()) {
+        if ($this->isInHiddenTab()) {
             // Leave only hidden plugins and remove all others
             foreach (array_keys($plugins) as $plugin) {
                 if (!in_array($plugin, $hidden)) {
@@ -167,7 +170,7 @@ final class HidePlugins
     /**
      * <i>Hint. This method does not use context from filter
      * "plugin_action_links", because that context will be "all" on custom
-     * category pages.</i>
+     * tabs.</i>
      *
      * @global int $page
      * @global string $s
@@ -180,12 +183,17 @@ final class HidePlugins
             return $actions;
         }
 
-        $action      = $this->isCategoryHidden() ? 'just_show_plugin' : 'just_hide_plugin';
+        // Do not try to hide must-use plugins
+        if ($this->context == 'mustuse') {
+            return $actions;
+        }
+
+        $action      = $this->isInHiddenTab() ? 'just_show_plugin' : 'just_hide_plugin';
         $nonceAction = $this->nonceKey($action, $plugin);
 
         // Build action text
         $actionText = '';
-        if ($this->isCategoryHidden()) {
+        if ($this->isInHiddenTab()) {
             $actionText = __('Show', 'just-hide-plugins');
         } else if (!$this->anotherHideFound) {
             $actionText = __('Hide', 'just-hide-plugins');
@@ -210,14 +218,14 @@ final class HidePlugins
         return $actions;
     }
 
-    public function addCategoryHidden(array $views): array
+    public function addHiddenPluginsTab(array $views): array
     {
         $class = 'hidden';
         $count = $this->getHiddenPluginsCount();
         $url   = add_query_arg('plugin_status', $class, 'plugins.php');
-        $atts  = $this->isCategoryHidden() ? ' class="current" aria-current="page"' : '';
+        $atts  = $this->isInHiddenTab() ? ' class="current" aria-current="page"' : '';
 
-        // Build category text
+        // Build tab text
         $text = '';
         if (!$this->anotherHideFound) {
             $text = _n('Hidden <span class="count">(%s)</span>', 'Hidden <span class="count">(%s)</span>', $count, 'just-hide-plugins');
@@ -234,7 +242,7 @@ final class HidePlugins
         return $views;
     }
 
-    private function isCategoryHidden(): bool
+    private function isInHiddenTab(): bool
     {
         return ($this->context == 'hidden');
     }
