@@ -16,3 +16,6 @@ Compared to [brianmiyaji's Hide Plugins v1.0.4](https://wordpress.org/plugins/hi
 * adds "Hidden" category on "Plugins" page, where you can disable hiding of the plugins.
 
 _The plugin does not conflict with [brianmiyaji's Hide Plugins](https://wordpress.org/plugins/hide-plugins/)._
+
+# License
+The project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
