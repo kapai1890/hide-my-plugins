@@ -23,7 +23,6 @@ if (!defined('ABSPATH')) {
 /**
  * @requires PHP 7.0
  * @requires WordPress 3.5.0
- * @todo Add "Hide" and "Show" to bulk actions.
  */
 final class HidePlugins
 {
@@ -79,7 +78,16 @@ final class HidePlugins
          *
          * @see https://developer.wordpress.org/reference/hooks/admin_init/
          */
-        add_action('admin_init', [$this, 'determineActivePlugins']);
+        add_action('admin_init', [$this, 'maybeRedirectBack'], 10);
+
+        /**
+         * Fires as an admin screen or script is being initialized.
+         *
+         * @requires WordPress 2.5.0
+         *
+         * @see https://developer.wordpress.org/reference/hooks/admin_init/
+         */
+        add_action('admin_init', [$this, 'determineActivePlugins'], 20);
 
         /**
          * Filters the full array of plugins to list in the Plugins list table.
@@ -134,6 +142,54 @@ final class HidePlugins
     public function loadTranslations()
     {
         load_plugin_textdomain('just-hide-plugins', false, 'just-hide-plugins/languages');
+    }
+
+    /**
+     * WordPress automatically redirects to "All" page of plugins.php after any
+     * action. We need to go back to "Hidden" tab when doing any action from
+     * there.
+     *
+     * @see wp-admin/plugins.php
+     *
+     * @todo Fix "The page isn't working" (while doing all the redirects).
+     */
+    public function maybeRedirectBack()
+    {
+        $refererUrl = $_SERVER['HTTP_REFERER'] ?? '';
+
+        if (empty($refererUrl) || strpos($refererUrl, 'plugins.php') === false) {
+            return;
+        }
+
+        // Still need to check, that "plugins.php" was referer script and not
+        // just a part of the string, for example:
+        //     admin.php?s=plugins.php
+
+        $referer = parse_url($refererUrl);
+
+        $file  = ( isset($referer['path']) ) ? preg_replace('/[^\/]*\//', '', $referer['path']) : '';
+        $query = $referer['query'] ?? '';
+
+        $actionDone = array_intersect(array_keys($_GET), ['activate', 'deactivate', 'activate-multi', 'deactivate-multi']);
+
+        if ($file == 'plugins.php'
+            && strpos($query, 'plugin_status=hidden') !== false
+            && !empty($actionDone)
+        ) {
+            // We need to go back to the tab "Hidden"
+            $newQuery = ['plugin_status' => 'hidden'];
+            $newQuery['paged'] = $_GET['paged'] ?? 1;
+            $newQuery['s'] = $_GET['s'] ?? '';
+
+            foreach ($actionDone as $action) {
+                $newQuery[$action] = $_GET[$action];
+            }
+
+            $redirectUrl = add_query_arg( $newQuery, admin_url('plugins.php'));
+
+            wp_safe_redirect($redirectUrl);
+            $this->stop(); // exit;
+        }
     }
 
     public function determineActivePlugins()
@@ -353,6 +409,11 @@ final class HidePlugins
         } else {
             die($message);
         }
+    }
+
+    private function stop()
+    {
+        exit;
     }
 
     public static function create()
