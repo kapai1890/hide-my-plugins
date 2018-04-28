@@ -6,7 +6,7 @@
  * Description: Allows to hide plugins from the plugins list.
  * Version: 18.15.1
  * Author: kapai1890
- * Author URI: https://github.com/kapai1890/
+ * Author URI: https://github.com/kapai1890
  * License: MIT
  * Text Domain: just-hide-plugins
  * Domain Path: /languages
@@ -185,7 +185,7 @@ final class HidePlugins
                 $newQuery[$action] = $_GET[$action];
             }
 
-            $redirectUrl = add_query_arg( $newQuery, admin_url('plugins.php'));
+            $redirectUrl = add_query_arg($newQuery, admin_url('plugins.php'));
 
             wp_safe_redirect($redirectUrl);
             $this->stop(); // exit;
@@ -250,11 +250,9 @@ final class HidePlugins
         // Build action text
         $actionText = '';
         if ($this->isInHiddenTab()) {
-            $actionText = __('Show', 'just-hide-plugins');
-        } else if (!$this->anotherHideFound) {
-            $actionText = __('Hide', 'just-hide-plugins');
+            $actionText = ( !$this->anotherHideFound ) ? __('Show', 'just-hide-plugins') : __('Just Show', 'just-hide-plugins');
         } else {
-            $actionText = __('Just Hide', 'just-hide-plugins');
+            $actionText = ( !$this->anotherHideFound ) ? __('Hide', 'just-hide-plugins') : __('Just Hide', 'just-hide-plugins');
         }
 
         // Build action URL
@@ -278,15 +276,15 @@ final class HidePlugins
     {
         $class = 'hidden';
         $count = $this->getHiddenPluginsCount();
-        $url   = add_query_arg('plugin_status', $class, 'plugins.php');
+        $url   = add_query_arg('plugin_status', $class, admin_url('plugins.php'));
         $atts  = $this->isInHiddenTab() ? ' class="current" aria-current="page"' : '';
 
         // Build tab text
         $text = '';
         if (!$this->anotherHideFound) {
-            $text = _n('Hidden <span class="count">(%s)</span>', 'Hidden <span class="count">(%s)</span>', $count, 'just-hide-plugins');
+            $text = sprintf(_n('Hidden %s', 'Hidden %s', $count, 'just-hide-plugins'), '<span class="count">(%s)</span>');
         } else {
-            $text = _n('Just Hidden <span class="count">(%s)</span>', 'Just Hidden <span class="count">(%s)</span>', $count, 'just-hide-plugins');
+            $text = sprintf(_n('Just Hidden %s', 'Just Hidden %s', $count, 'just-hide-plugins'), '<span class="count">(%s)</span>');
         }
         $text = sprintf($text, number_format_i18n($count));
 
@@ -423,5 +421,4 @@ final class HidePlugins
         }
     }
 }
-
 HidePlugins::create();
