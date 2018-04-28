@@ -50,7 +50,7 @@ final class HidePlugins
      *
      * @var bool
      */
-    private $anotherHideFound = false;
+    private $anotherHiderExists = false;
 
     private function __construct()
     {
@@ -202,7 +202,7 @@ final class HidePlugins
 
     public function determineActivePlugins()
     {
-        $this->anotherHideFound |= is_plugin_active('hide-plugins/hide-plugins.php');
+        $this->anotherHiderExists |= is_plugin_active('hide-plugins/hide-plugins.php');
     }
 
     public function filterPluginsList(array $plugins): array
@@ -258,9 +258,9 @@ final class HidePlugins
         // Build action text
         $actionText = '';
         if ($this->inHidden) {
-            $actionText = ( !$this->anotherHideFound ) ? __('Show', 'just-hide-plugins') : __('Just Show', 'just-hide-plugins');
+            $actionText = ( !$this->isAnotherHiderExists() ) ? __('Show', 'just-hide-plugins') : __('Just Show', 'just-hide-plugins');
         } else {
-            $actionText = ( !$this->anotherHideFound ) ? __('Hide', 'just-hide-plugins') : __('Just Hide', 'just-hide-plugins');
+            $actionText = ( !$this->isAnotherHiderExists() ) ? __('Hide', 'just-hide-plugins') : __('Just Hide', 'just-hide-plugins');
         }
 
         // Build action URL
@@ -289,7 +289,7 @@ final class HidePlugins
 
         // Build tab text
         $text = '';
-        if (!$this->anotherHideFound) {
+        if (!$this->isAnotherHiderExists()) {
             $text = sprintf(_n('Hidden %s', 'Hidden %s', $count, 'just-hide-plugins'), '<span class="count">(%s)</span>');
         } else {
             $text = sprintf(_n('Just Hidden %s', 'Just Hidden %s', $count, 'just-hide-plugins'), '<span class="count">(%s)</span>');
@@ -359,6 +359,15 @@ final class HidePlugins
         $verification = wp_verify_nonce($nonce, $nonceAction);
 
         return ($verification !== false);
+    }
+
+    private function isAnotherHiderExists()
+    {
+        if (!$this->anotherHiderExists) {
+            $this->anotherHiderExists = apply_filters( 'just_hide_plugins_another_hider_exists', $this->anotherHiderExists);
+        }
+
+        return $this->anotherHiderExists;
     }
 
     private function nonceKey(string $action, string $plugin): string
