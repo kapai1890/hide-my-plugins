@@ -39,6 +39,13 @@ final class HidePlugins
     private $context = 'all';
 
     /**
+     * Is on tab "Hidden".
+     *
+     * @var bool
+     */
+    private $inHidden = false;
+
+    /**
      * Is another hide plugin found.
      *
      * @var bool
@@ -49,6 +56,7 @@ final class HidePlugins
     {
         if (isset($_GET['plugin_status'])) {
             $this->context = sanitize_text_field($_GET['plugin_status']);
+            $this->inHidden = ( $this->context == 'hidden' );
         }
 
         register_activation_hook(__FILE__, [$this, 'onActivate']);
@@ -201,7 +209,7 @@ final class HidePlugins
     {
         $hidden = $this->getHiddenPlugins();
 
-        if ($this->isInHiddenTab()) {
+        if ($this->inHidden) {
             // Leave only hidden plugins and remove all others
             foreach (array_keys($plugins) as $plugin) {
                 if (!in_array($plugin, $hidden)) {
@@ -244,12 +252,12 @@ final class HidePlugins
             return $actions;
         }
 
-        $action      = $this->isInHiddenTab() ? 'just_show_plugin' : 'just_hide_plugin';
+        $action      = $this->inHidden ? 'just_show_plugin' : 'just_hide_plugin';
         $nonceAction = $this->nonceKey($action, $plugin);
 
         // Build action text
         $actionText = '';
-        if ($this->isInHiddenTab()) {
+        if ($this->inHidden) {
             $actionText = ( !$this->anotherHideFound ) ? __('Show', 'just-hide-plugins') : __('Just Show', 'just-hide-plugins');
         } else {
             $actionText = ( !$this->anotherHideFound ) ? __('Hide', 'just-hide-plugins') : __('Just Hide', 'just-hide-plugins');
@@ -277,7 +285,7 @@ final class HidePlugins
         $class = 'hidden';
         $count = $this->getHiddenPluginsCount();
         $url   = add_query_arg('plugin_status', $class, admin_url('plugins.php'));
-        $atts  = $this->isInHiddenTab() ? ' class="current" aria-current="page"' : '';
+        $atts  = $this->inHidden ? ' class="current" aria-current="page"' : '';
 
         // Build tab text
         $text = '';
@@ -294,16 +302,6 @@ final class HidePlugins
         $views[$class] = $view;
 
         return $views;
-    }
-
-    private function isInHiddenTab(): bool
-    {
-        return ($this->context == 'hidden');
-    }
-
-    public function onActivate()
-    {
-        add_option('just_hidden_plugins', [], '', 'no');
     }
 
     public function onHidePlugin()
@@ -366,6 +364,11 @@ final class HidePlugins
     private function nonceKey(string $action, string $plugin): string
     {
         return $action . '_' . $plugin;
+    }
+
+    public function onActivate()
+    {
+        add_option('just_hidden_plugins', [], '', 'no');
     }
 
     private function getHiddenPlugins(): array
