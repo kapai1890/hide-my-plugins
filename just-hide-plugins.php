@@ -4,7 +4,7 @@
  * Plugin Name: Hide Plugins
  * Plugin URI: https://github.com/kapai1890/just-hide-plugins
  * Description: Allows to hide plugins from the plugins list.
- * Version: 18.15.1
+ * Version: 18.17.2
  * Author: kapai1890
  * Author URI: https://github.com/kapai1890
  * License: MIT
