@@ -56,7 +56,7 @@ final class HidePlugins
     {
         if (isset($_GET['plugin_status'])) {
             $this->context = sanitize_text_field($_GET['plugin_status']);
-            $this->inHidden = ( $this->context == 'hidden' );
+            $this->inHidden = ($this->context == 'hidden');
         }
 
         register_activation_hook(__FILE__, [$this, 'onActivate']);
@@ -67,6 +67,11 @@ final class HidePlugins
         }
     }
 
+    public function onActivate()
+    {
+        add_option('just_hidden_plugins', [], '', 'no');
+    }
+
     private function addActions()
     {
         /**
@@ -74,7 +79,6 @@ final class HidePlugins
          * sent.
          *
          * @requires WordPress 1.5
-         *
          * @see https://developer.wordpress.org/reference/hooks/init/
          */
         add_action('init', [$this, 'loadTranslations']);
@@ -83,7 +87,6 @@ final class HidePlugins
          * Fires as an admin screen or script is being initialized.
          *
          * @requires WordPress 2.5.0
-         *
          * @see https://developer.wordpress.org/reference/hooks/admin_init/
          */
         add_action('admin_init', [$this, 'maybeRedirectBack'], 10);
@@ -92,7 +95,6 @@ final class HidePlugins
          * Fires as an admin screen or script is being initialized.
          *
          * @requires WordPress 2.5.0
-         *
          * @see https://developer.wordpress.org/reference/hooks/admin_init/
          */
         add_action('admin_init', [$this, 'determineActivePlugins'], 20);
@@ -101,7 +103,6 @@ final class HidePlugins
          * Filters the full array of plugins to list in the Plugins list table.
          *
          * @requires WordPress 3.0.0
-         *
          * @see https://developer.wordpress.org/reference/hooks/all_plugins/
          */
         add_filter('all_plugins', [$this, 'filterPluginsList']);
@@ -113,7 +114,6 @@ final class HidePlugins
          * Filter "plugin_action_links_{$plugin}" fires after.
          *
          * @requires WordPress 2.5.0
-         *
          * @see https://developer.wordpress.org/reference/hooks/plugin_action_links/
          */
         add_filter('plugin_action_links', [$this, 'filterPluginActions'], 10, 2);
@@ -122,7 +122,6 @@ final class HidePlugins
          * Fires when an "action" request variable is sent.
          *
          * @requires WordPress 2.6.0
-         *
          * @see https://developer.wordpress.org/reference/hooks/admin_action__requestaction/
          */
         add_action('admin_action_just_hide_plugin', [$this, 'onHidePlugin']);
@@ -131,7 +130,6 @@ final class HidePlugins
          * Fires when an "action" request variable is sent.
          *
          * @requires WordPress 2.6.0
-         *
          * @see https://developer.wordpress.org/reference/hooks/admin_action__requestaction/
          */
         add_action('admin_action_just_show_plugin', [$this, 'onShowPlugin']);
@@ -140,7 +138,6 @@ final class HidePlugins
          * Filters the list of available list table views.
          *
          * @requires WordPress 3.5.0
-         *
          * @see https://developer.wordpress.org/reference/hooks/views_this-screen-id/
          * @see \WP_List_Table::views() in wp-admin/includes/class-wp-list-table.php
          */
@@ -375,11 +372,6 @@ final class HidePlugins
         return $action . '_' . $plugin;
     }
 
-    public function onActivate()
-    {
-        add_option('just_hidden_plugins', [], '', 'no');
-    }
-
     private function getHiddenPlugins(): array
     {
         return get_option('just_hidden_plugins', []);
@@ -433,4 +425,5 @@ final class HidePlugins
         }
     }
 }
+
 HidePlugins::create();
