@@ -206,9 +206,10 @@ class HidePlugins
             return $actions;
         }
 
-        $action      = $this->isTabHidden ? 'unhide_plugin' : 'hide_plugin';
+        $isHidden    = $this->isHiddenPlugin($plugin);
+        $actionText  = $isHidden ? __('Unhide', 'hide-plugins') : __('Hide', 'hide-plugins');
+        $action      = $isHidden ? 'unhide_plugin' : 'hide_plugin';
         $nonceAction = $this->nonceKey($action, $plugin);
-        $actionText  = $this->isTabHidden ? __('Unhide', 'hide-plugins') : __('Hide', 'hide-plugins');
 
         // Build action URL
         $actionUrl = add_query_arg([
