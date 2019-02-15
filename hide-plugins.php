@@ -39,7 +39,7 @@ class HidePlugins
      *
      * @var bool
      */
-    protected $isManageableTab = false;
+    protected $isManageableTab = true;
 
     /**
      * Visible/not hidden plugins count.
