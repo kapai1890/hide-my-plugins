@@ -34,11 +34,34 @@ class HidePlugins
      */
     protected $isTabHidden = false;
 
+    /**
+     * Is on tab "All" or "Hidden".
+     *
+     * @var bool
+     */
+    protected $isManageableTab = false;
+
+    /**
+     * Visible/not hidden plugins count.
+     *
+     * @var int
+     */
+    protected $visibleCount = 0;
+
+    /**
+     * Hidden plugins count.
+     *
+     * @var int
+     */
+    protected $hiddenCount = 0;
+
     public function __construct()
     {
         if (isset($_GET['plugin_status'])) {
-            $this->activeTab   = sanitize_text_field($_GET['plugin_status']);
-            $this->isTabHidden = $this->activeTab == 'hidden';
+            $this->activeTab = sanitize_text_field($_GET['plugin_status']);
+
+            $this->isTabHidden     = $this->activeTab == 'hidden';
+            $this->isManageableTab = $this->isTabHidden || $this->activeTab == 'all';
         }
 
         register_activation_hook(__FILE__, [$this, 'onActivate']);
@@ -56,66 +79,32 @@ class HidePlugins
 
     protected function addActions()
     {
-        /**
-         * Fires after WordPress has finished loading but before any headers are
-         * sent.
-         *
-         * @requires WordPress 1.5
-         * @see https://developer.wordpress.org/reference/hooks/init/
-         */
+        /** @requires WordPress 1.5 */
         add_action('init', [$this, 'loadTranslations']);
 
-        /**
-         * Fires as an admin screen or script is being initialized.
-         *
-         * @requires WordPress 2.5.0
-         * @see https://developer.wordpress.org/reference/hooks/admin_init/
-         */
+        /** @requires WordPress 2.5.0 */
         add_action('admin_init', [$this, 'maybeRedirectBack']);
 
-        /**
-         * Filters the full array of plugins to list in the Plugins list table.
-         *
-         * @requires WordPress 3.0.0
-         * @see https://developer.wordpress.org/reference/hooks/all_plugins/
-         */
-        add_filter('all_plugins', [$this, 'filterPluginsList']);
+        /** @requires WordPress 3.0.0 */
+        add_filter('all_plugins', [$this, 'countPlugins']);
 
-        /**
-         * Filters the action links displayed for each plugin in the Plugins
-         * list table.
-         *
-         * Filter "plugin_action_links_{$plugin}" fires after.
-         *
-         * @requires WordPress 2.5.0
-         * @see https://developer.wordpress.org/reference/hooks/plugin_action_links/
-         */
+        /** @requires WordPress 2.5.0 */
         add_filter('plugin_action_links', [$this, 'filterPluginActions'], 10, 2);
+        add_filter('plugin_action_links', [$this, 'startOutputBuffering']);
 
-        /**
-         * Fires when an "action" request variable is sent.
-         *
-         * @requires WordPress 2.6.0
-         * @see https://developer.wordpress.org/reference/hooks/admin_action__requestaction/
-         */
+        /** @requires WordPress 2.3.0 */
+        add_action('after_plugin_row', [$this, 'endOutputBuffering'], 10, 1);
+
+        /** @requires WordPress 2.6.0 */
         add_action('admin_action_hide_plugin', [$this, 'onHidePlugin']);
-
-        /**
-         * Fires when an "action" request variable is sent.
-         *
-         * @requires WordPress 2.6.0
-         * @see https://developer.wordpress.org/reference/hooks/admin_action__requestaction/
-         */
         add_action('admin_action_unhide_plugin', [$this, 'onUnhidePlugin']);
 
         /**
-         * Filters the list of available list table views.
-         *
          * @requires WordPress 3.5.0
-         * @see https://developer.wordpress.org/reference/hooks/views_this-screen-id/
          * @see \WP_List_Table::views() in wp-admin/includes/class-wp-list-table.php
          */
         add_filter('views_plugins', [$this, 'addHiddenPluginsTab']);
+        add_filter('views_plugins', [$this, 'fixTotals']);
     }
 
     public function loadTranslations()
@@ -177,26 +166,15 @@ class HidePlugins
      * @param array $plugins
      * @return array
      */
-    public function filterPluginsList($plugins)
+    public function countPlugins($plugins)
     {
-        $hiddenPlugins = $this->getHiddenPlugins();
-
-        if ($this->isTabHidden) {
-            // Leave only hidden plugins and remove all others
-            foreach (array_keys($plugins) as $plugin) {
-                if (!in_array($plugin, $hiddenPlugins)) {
-                    // Can't just set $plugins = $hiddenPlugins, $plugins
-                    // contains information about all plugins
-                    unset($plugins[$plugin]);
-                }
-            }
-
-        } else {
-            // Remove hidden plugins from the list
-            foreach ($hiddenPlugins as $plugin) {
-                if (isset($plugins[$plugin])) {
-                    unset($plugins[$plugin]);
-                }
+        // Count only real plugins. $this->getHiddenPlugins() may have
+        // nonexistent plugins, for example, removed plugins
+        foreach (array_keys($plugins) as $plugin) {
+            if ($this->isHiddenPlugin($plugin)) {
+                $this->hiddenCount++;
+            } else {
+                $this->visibleCount++;
             }
         }
 
@@ -251,24 +229,62 @@ class HidePlugins
     }
 
     /**
+     * @param array $filteredVar Plugin actions.
+     * @return array
+     */
+    public function startOutputBuffering($filteredVar)
+    {
+        // Magic starts here
+        ob_start();
+
+        return $filteredVar;
+    }
+
+    public function endOutputBuffering($plugin)
+    {
+        $output = ob_get_clean();
+
+        if (!$this->isManageableTab) {
+            // Change the plugins list only on tabs "All" and "Hidden" and leave
+            // other as is
+            echo $output;
+        } else if ($this->isHiddenPlugin($plugin) == $this->isTabHidden) {
+            // Is a proper plugin for current tab
+            echo $output;
+        }
+    }
+
+    /**
      * @param array $views
      * @return array
      */
     public function addHiddenPluginsTab($views)
     {
-        $url   = add_query_arg('plugin_status', 'hidden', admin_url('plugins.php'));
-        $atts  = $this->isTabHidden ? ' class="current" aria-current="page"' : '';
-        $count = $this->getHiddenPluginsCount();
+        $url  = add_query_arg('plugin_status', 'hidden', admin_url('plugins.php'));
+        $atts = $this->isTabHidden ? ' class="current" aria-current="page"' : '';
 
         // Build tab text
         $text = sprintf(__('Hidden %s', 'hide-plugins'), '<span class="count">(%s)</span>');
-        $text = sprintf($text, number_format_i18n($count));
+        $text = sprintf($text, number_format_i18n($this->hiddenCount));
 
         // See "<a href..." in \WP_Plugins_List_Table::get_views() in
         // wp-admin/includes/class-wp-plugins-list-table.php
         $view = sprintf('<a href="%s"%s>%s</a>', esc_url($url), $atts, $text);
 
         $views['hidden'] = $view;
+
+        return $views;
+    }
+
+    /**
+     * @param array $views
+     * @return array
+     */
+    public function fixTotals($views)
+    {
+        if (isset($views['all'])) {
+            $views['all'] = preg_replace('/\(\d+\)/', "({$this->visibleCount})", $views['all']);
+        }
 
         return $views;
     }
@@ -318,7 +334,7 @@ class HidePlugins
                 break;
         }
 
-        $this->updateHiddenPlugins($hiddenPlugins);
+        $this->setHiddenPlugins($hiddenPlugins);
     }
 
     /**
@@ -354,23 +370,20 @@ class HidePlugins
     }
 
     /**
-     * @return int
-     */
-    protected function getHiddenPluginsCount()
-    {
-        $hiddenPlugins = $this->getHiddenPlugins();
-        return count($hiddenPlugins);
-    }
-
-    /**
      * @param array $plugins
      */
-    protected function updateHiddenPlugins($plugins)
+    protected function setHiddenPlugins($plugins)
     {
         update_option('hidden_plugins', $plugins);
     }
 
-    private function selfDestruction()
+    protected function isHiddenPlugin($plugin)
+    {
+        $hiddenPlugins = $this->getHiddenPlugins();
+        return in_array($plugin, $hiddenPlugins);
+    }
+
+    protected function selfDestruction()
     {
         exit;
     }
