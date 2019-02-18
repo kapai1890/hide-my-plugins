@@ -268,6 +268,11 @@ class HideMyPlugins
      */
     public function addHiddenPluginsTab($views)
     {
+        // Don't add the tab when there are no hidden plugins
+        if ($this->hiddenCount == 0) {
+            return $views;
+        }
+
         $url  = add_query_arg('plugin_status', 'hidden', admin_url('plugins.php'));
         $atts = $this->isTabHidden ? ' class="current" aria-current="page"' : '';
 
