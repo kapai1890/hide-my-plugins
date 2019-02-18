@@ -1,14 +1,14 @@
 <?php
 
 /*
- * Plugin Name: Hide Plugins
- * Plugin URI: https://github.com/kapai1890/hide-plugins
+ * Plugin Name: Hide My Plugins
+ * Plugin URI: https://github.com/kapai1890/hide-my-plugins
  * Description: Hides plugins from the plugins list.
- * Version: 1.4.30
+ * Version: 1.4.31
  * Author: Biliavskyi Yevhen
  * Author URI: https://github.com/kapai1890
  * License: MIT
- * Text Domain: hide-plugins
+ * Text Domain: hide-my-plugins
  * Domain Path: /languages
  */
 
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit('Press Enter to proceed...');
 }
 
-class HidePlugins
+class HideMyPlugins
 {
     /**
      * Current active tab. By default this can include "all", "active",
@@ -74,7 +74,7 @@ class HidePlugins
 
     public function onActivate()
     {
-        add_option('hidden_plugins', [], '', 'no');
+        add_option('my_hidden_plugins', [], '', 'no');
     }
 
     protected function addActions()
@@ -96,8 +96,8 @@ class HidePlugins
         add_action('after_plugin_row', [$this, 'endOutputBuffering'], 10, 1);
 
         /** @requires WordPress 2.6.0 */
-        add_action('admin_action_hide_plugin', [$this, 'onHidePlugin']);
-        add_action('admin_action_unhide_plugin', [$this, 'onUnhidePlugin']);
+        add_action('admin_action_hide_my_plugin', [$this, 'onHidePlugin']);
+        add_action('admin_action_unhide_my_plugin', [$this, 'onUnhidePlugin']);
 
         /**
          * @requires WordPress 3.5.0
@@ -109,7 +109,7 @@ class HidePlugins
 
     public function loadTranslations()
     {
-        load_plugin_textdomain('hide-plugins', false, 'hide-plugins/languages');
+        load_plugin_textdomain('hide-my-plugins', false, 'hide-my-plugins/languages');
     }
 
     /**
@@ -207,8 +207,8 @@ class HidePlugins
         }
 
         $isHidden    = $this->isHiddenPlugin($plugin);
-        $actionText  = $isHidden ? __('Unhide', 'hide-plugins') : __('Hide', 'hide-plugins');
-        $action      = $isHidden ? 'unhide_plugin' : 'hide_plugin';
+        $actionText  = $isHidden ? __('Unhide', 'hide-my-plugins') : __('Hide', 'hide-my-plugins');
+        $action      = $isHidden ? 'unhide_my_plugin' : 'hide_my_plugin';
         $nonceAction = $this->nonceKey($action, $plugin);
 
         // Build action URL
@@ -220,7 +220,7 @@ class HidePlugins
             'plugin'        => $plugin
         ], 'plugins.php');
 
-        $actionUrl = wp_nonce_url($actionUrl, $nonceAction, 'hide_plugins_nonce');
+        $actionUrl = wp_nonce_url($actionUrl, $nonceAction, 'hide_my_plugins_nonce');
 
         $actionLink = '<a href="' . esc_url($actionUrl) . '" title="' . esc_attr($actionText) . '" class="edit">' . esc_html($actionText) . '</a>';
 
@@ -241,13 +241,16 @@ class HidePlugins
         return $filteredVar;
     }
 
+    /**
+     * @param string $plugin
+     */
     public function endOutputBuffering($plugin)
     {
         $output = ob_get_clean();
 
         if (!$this->isManageableTab) {
-            // Change the plugins list only on tabs "All" and "Hidden" and leave
-            // other as is
+            // Change the plugins list only on tabs "All" and "Hidden", and
+            // leave other as is
             echo $output;
         } else if ($this->isHiddenPlugin($plugin) == $this->isTabHidden) {
             // Is a proper plugin for current tab
@@ -265,7 +268,7 @@ class HidePlugins
         $atts = $this->isTabHidden ? ' class="current" aria-current="page"' : '';
 
         // Build tab text
-        $text = sprintf(__('Hidden %s', 'hide-plugins'), '<span class="count">(%s)</span>');
+        $text = sprintf(__('Hidden %s', 'hide-my-plugins'), '<span class="count">(%s)</span>');
         $text = sprintf($text, number_format_i18n($this->hiddenCount));
 
         // See "<a href..." in \WP_Plugins_List_Table::get_views() in
@@ -345,7 +348,7 @@ class HidePlugins
      */
     protected function isValidInput($action, $plugin)
     {
-        $nonce       = isset($_REQUEST['hide_plugins_nonce']) ? $_REQUEST['hide_plugins_nonce'] : '';
+        $nonce       = isset($_REQUEST['hide_my_plugins_nonce']) ? $_REQUEST['hide_my_plugins_nonce'] : '';
         $nonceAction = $this->nonceKey($action, $plugin);
         $verified    = wp_verify_nonce($nonce, $nonceAction);
 
@@ -367,7 +370,7 @@ class HidePlugins
      */
     protected function getHiddenPlugins()
     {
-        return get_option('hidden_plugins', []);
+        return get_option('my_hidden_plugins', []);
     }
 
     /**
@@ -375,7 +378,7 @@ class HidePlugins
      */
     protected function setHiddenPlugins($plugins)
     {
-        update_option('hidden_plugins', $plugins);
+        update_option('my_hidden_plugins', $plugins);
     }
 
     protected function isHiddenPlugin($plugin)
@@ -390,5 +393,5 @@ class HidePlugins
     }
 }
 
-global $hidePlugins;
-$hidePlugins = new HidePlugins();
+global $hideMyPlugins;
+$hideMyPlugins = new HideMyPlugins();
