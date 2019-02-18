@@ -238,6 +238,10 @@ class HideMyPlugins
         // Magic starts here
         ob_start();
 
+        // Known side effect: you will not see the message "You do not appear to
+        // have any plugins available at this time." with all plugins hidden.
+        // You'll see the empty table instead.
+
         return $filteredVar;
     }
 
