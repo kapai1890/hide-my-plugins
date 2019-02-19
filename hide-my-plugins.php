@@ -42,6 +42,13 @@ class HideMyPlugins
     protected $isManageableTab = true;
 
     /**
+     * The total amount of plugins.
+     *
+     * @var int
+     */
+    protected $totalCount = 0;
+
+    /**
      * Visible/not hidden plugins count.
      *
      * @var int
@@ -54,6 +61,20 @@ class HideMyPlugins
      * @var int
      */
     protected $hiddenCount = 0;
+
+    /**
+     * How many plugins tried to show (but some remained hidden).
+     *
+     * @var int
+     */
+    protected $processedCount = 0;
+
+    /**
+     * How many plugins shown in the current tab.
+     *
+     * @var int
+     */
+    protected $shownCount = 0;
 
     public function __construct()
     {
@@ -169,6 +190,8 @@ class HideMyPlugins
      */
     public function countPlugins($plugins)
     {
+        $this->totalCount = count($plugins);
+
         // Count only real plugins. $this->getHiddenPlugins() may have
         // nonexistent plugins, for example, removed plugins
         foreach (array_keys($plugins) as $plugin) {
@@ -239,10 +262,6 @@ class HideMyPlugins
         // Magic starts here
         ob_start();
 
-        // Known side effect: you will not see the message "You do not appear to
-        // have any plugins available at this time." with all plugins hidden.
-        // You'll see the empty table instead.
-
         return $filteredVar;
     }
 
@@ -253,13 +272,25 @@ class HideMyPlugins
     {
         $output = ob_get_clean();
 
-        if (!$this->isManageableTab) {
-            // Change the plugins list only on tabs "All" and "Hidden", and
-            // leave other as is
+        // Change the plugins list only on tabs "All" and "Hidden", show other
+        // tabs without changes
+        if (!$this->isManageableTab
+            // Or is a proper plugin for current tab
+            || $this->isHiddenPlugin($plugin) == $this->isTabHidden
+        ) {
             echo $output;
-        } else if ($this->isHiddenPlugin($plugin) == $this->isTabHidden) {
-            // Is a proper plugin for current tab
-            echo $output;
+            $this->shownCount++;
+        }
+
+        $this->processedCount++;
+
+        // Show no-items message
+        if ($this->processedCount == $this->totalCount && $this->shownCount == 0) {
+            echo '<tr class="no-items">';
+                echo '<td class="colspanchange" colspan="3">';
+                    _e('You do not appear to have any plugins available at this time.');
+                echo '</td>';
+            echo '</tr>';
         }
     }
 
