@@ -126,7 +126,7 @@ class HideMyPlugins
          * @see \WP_List_Table::views() in wp-admin/includes/class-wp-list-table.php
          */
         add_filter('views_plugins', [$this, 'addHiddenPluginsTab']);
-        add_filter('views_plugins', [$this, 'fixTotals']);
+        add_filter('views_plugins', [$this, 'fixTabs']);
     }
 
     public function loadTranslations()
@@ -325,10 +325,16 @@ class HideMyPlugins
      * @param array $views
      * @return array
      */
-    public function fixTotals($views)
+    public function fixTabs($views)
     {
         if (isset($views['all'])) {
+            // Fix totals: "All (15)" -> "All (%total% - %hidden%)"
             $views['all'] = preg_replace('/\(\d+\)/', "({$this->visibleCount})", $views['all']);
+
+            // Remove class "current" from tab "All", when displaying "Hidden"
+            if ($this->isTabHidden) {
+                $views['all'] = preg_replace('/( class="current")|( aria-current="page")/', '', $views['all']);
+            }
         }
 
         return $views;
