@@ -301,7 +301,7 @@ class HideMyPlugins
     public function addHiddenPluginsTab($views)
     {
         // Don't add the tab when there are no hidden plugins
-        if ($this->hiddenCount == 0 && $this->activeTab != 'hidden') {
+        if ($this->hiddenCount == 0 && !$this->isTabHidden) {
             return $views;
         }
 
