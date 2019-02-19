@@ -66,8 +66,9 @@ class HideMyPlugins
 
         register_activation_hook(__FILE__, [$this, 'onActivate']);
 
-        // No need to add actions on AJAX calls
-        if (!defined('DOING_AJAX') || !DOING_AJAX) {
+        // No need to run the plugin on AJAX calls and on multisite admin
+        $isAjax = defined('DOING_AJAX') && DOING_AJAX;
+        if (!$isAjax && !is_network_admin()) {
             $this->addActions();
         }
     }
