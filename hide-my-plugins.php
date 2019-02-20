@@ -85,18 +85,10 @@ class HideMyPlugins
             $this->isManageableTab = $this->isTabHidden || $this->activeTab == 'all';
         }
 
-        register_activation_hook(__FILE__, [$this, 'onActivate']);
-
-        // No need to run the plugin on AJAX calls and on multisite admin
-        $isAjax = defined('DOING_AJAX') && DOING_AJAX;
-        if (!$isAjax && !is_network_admin()) {
+        // No need to filter anything on AJAX calls
+        if (!defined('DOING_AJAX') || !DOING_AJAX) {
             $this->addActions();
         }
-    }
-
-    public function onActivate()
-    {
-        add_option('my_hidden_plugins', [], '', 'no');
     }
 
     protected function addActions()
@@ -114,6 +106,10 @@ class HideMyPlugins
         add_filter('plugin_action_links', [$this, 'filterPluginActions'], 10, 2);
         add_filter('plugin_action_links', [$this, 'startOutputBuffering']);
 
+        /** @requires WordPress 3.1.0 */
+        add_filter('network_admin_plugin_action_links', [$this, 'filterPluginActions'], 10, 2);
+        add_filter('network_admin_plugin_action_links', [$this, 'startOutputBuffering']);
+
         /** @requires WordPress 2.3.0 */
         add_action('after_plugin_row', [$this, 'endOutputBuffering'], 10, 1);
 
@@ -127,6 +123,8 @@ class HideMyPlugins
          */
         add_filter('views_plugins', [$this, 'addHiddenPluginsTab']);
         add_filter('views_plugins', [$this, 'fixTabs']);
+        add_filter('views_plugins-network', [$this, 'addHiddenPluginsTab']);
+        add_filter('views_plugins-network', [$this, 'fixTabs']);
     }
 
     public function loadTranslations()
@@ -177,7 +175,7 @@ class HideMyPlugins
                 $newQuery[$action] = sanitize_text_field($_GET[$action]);
             }
 
-            $redirectUrl = add_query_arg($newQuery, admin_url('plugins.php'));
+            $redirectUrl = add_query_arg($newQuery, $this->adminUrl());
             wp_safe_redirect($redirectUrl);
 
             $this->selfDestruction(); // exit;
@@ -221,7 +219,7 @@ class HideMyPlugins
     {
         global $page, $s; // Support current page number and search query
 
-        if (!current_user_can('delete_plugins')) {
+        if (!$this->userCanManagePlugins()) {
             return $actions;
         }
 
@@ -236,13 +234,16 @@ class HideMyPlugins
         $nonceAction = $this->nonceKey($action, $plugin);
 
         // Build action URL
-        $actionUrl = add_query_arg([
-            'plugin_status' => $this->activeTab,
-            'paged'         => $page,
-            's'             => $s,
-            'action'        => $action,
-            'plugin'        => $plugin
-        ], 'plugins.php');
+        $actionUrl = add_query_arg(
+            [
+                'plugin_status' => $this->activeTab,
+                'paged'         => $page,
+                's'             => $s,
+                'action'        => $action,
+                'plugin'        => $plugin
+            ],
+            $this->adminUrl()
+        );
 
         $actionUrl = wp_nonce_url($actionUrl, $nonceAction, 'hide_my_plugins_nonce');
 
@@ -305,7 +306,7 @@ class HideMyPlugins
             return $views;
         }
 
-        $url  = add_query_arg('plugin_status', 'hidden', admin_url('plugins.php'));
+        $url  = add_query_arg('plugin_status', 'hidden', $this->adminUrl());
         $atts = $this->isTabHidden ? ' class="current" aria-current="page"' : '';
 
         // Build tab text
@@ -362,7 +363,7 @@ class HideMyPlugins
         $pluginAction = sanitize_text_field($_GET['action']);
         $pluginName   = sanitize_text_field($_GET['plugin']);
 
-        if (!$this->isValidInput($pluginAction, $pluginName) || !current_user_can('delete_plugins')) {
+        if (!$this->isValidInput($pluginAction, $pluginName) || !$this->userCanManagePlugins()) {
             return;
         }
 
@@ -413,11 +414,39 @@ class HideMyPlugins
     }
 
     /**
+     * @return string
+     */
+    protected function adminUrl()
+    {
+        if (!is_network_admin()) {
+            return admin_url('plugins.php');
+        } else {
+            return admin_url('network/plugins.php');
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function userCanManagePlugins()
+    {
+        if (!is_network_admin()) {
+            return current_user_can('install_plugins');
+        } else {
+            return current_user_can('manage_network_plugins');
+        }
+    }
+
+    /**
      * @return array
      */
     protected function getHiddenPlugins()
     {
-        return get_option('my_hidden_plugins', []);
+        if (!is_network_admin()) {
+            return get_option('my_hidden_plugins', []);
+        } else {
+            return get_site_option('my_hidden_plugins', []);
+        }
     }
 
     /**
@@ -425,7 +454,11 @@ class HideMyPlugins
      */
     protected function setHiddenPlugins($plugins)
     {
-        update_option('my_hidden_plugins', $plugins);
+        if (!is_network_admin()) {
+            update_option('my_hidden_plugins', $plugins, false);
+        } else {
+            update_site_option('my_hidden_plugins', $plugins);
+        }
     }
 
     protected function isHiddenPlugin($plugin)
