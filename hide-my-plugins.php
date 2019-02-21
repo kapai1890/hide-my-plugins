@@ -104,14 +104,11 @@ class HideMyPlugins
 
         /** @requires WordPress 2.5.0 */
         add_filter('plugin_action_links', [$this, 'filterPluginActions'], 10, 2);
-        add_filter('plugin_action_links', [$this, 'startOutputBuffering']);
+        add_filter('plugin_action_links', [$this, 'startOutputBuffering'], 10, 2);
 
         /** @requires WordPress 3.1.0 */
         add_filter('network_admin_plugin_action_links', [$this, 'filterPluginActions'], 10, 2);
-        add_filter('network_admin_plugin_action_links', [$this, 'startOutputBuffering']);
-
-        /** @requires WordPress 2.3.0 */
-        add_action('after_plugin_row', [$this, 'endOutputBuffering'], 10, 1);
+        add_filter('network_admin_plugin_action_links', [$this, 'startOutputBuffering'], 10, 2);
 
         /** @requires WordPress 2.6.0 */
         add_action('admin_action_hide_my_plugin', [$this, 'onHidePlugin']);
@@ -258,10 +255,16 @@ class HideMyPlugins
      * @param array $filteredVar Plugin actions.
      * @return array
      */
-    public function startOutputBuffering($filteredVar)
+    public function startOutputBuffering($filteredVar, $plugin)
     {
         // Magic starts here
         ob_start();
+
+        // The priority must be higher than priority (10) of
+        // wp_plugin_update_row(). See add_action() in function
+        // wp_plugin_update_rows() in wp-admin/includes/update.php
+        /** @requires WordPress 2.7.0 */
+        add_action("after_plugin_row_{$plugin}", [$this, 'endOutputBuffering'], 20, 1);
 
         return $filteredVar;
     }
