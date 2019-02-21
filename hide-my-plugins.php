@@ -88,6 +88,7 @@ class HideMyPlugins
         // No need to filter anything on AJAX calls
         if (!defined('DOING_AJAX') || !DOING_AJAX) {
             $this->addActions();
+            $this->addNetworkActions();
         }
     }
 
@@ -106,10 +107,6 @@ class HideMyPlugins
         add_filter('plugin_action_links', [$this, 'filterPluginActions'], 10, 2);
         add_filter('plugin_action_links', [$this, 'startOutputBuffering'], 10, 2);
 
-        /** @requires WordPress 3.1.0 */
-        add_filter('network_admin_plugin_action_links', [$this, 'filterPluginActions'], 10, 2);
-        add_filter('network_admin_plugin_action_links', [$this, 'startOutputBuffering'], 10, 2);
-
         /** @requires WordPress 2.6.0 */
         add_action('admin_action_hide_my_plugin', [$this, 'onHidePlugin']);
         add_action('admin_action_unhide_my_plugin', [$this, 'onUnhidePlugin']);
@@ -120,6 +117,18 @@ class HideMyPlugins
          */
         add_filter('views_plugins', [$this, 'addHiddenPluginsTab']);
         add_filter('views_plugins', [$this, 'fixTabs']);
+    }
+
+    protected function addNetworkActions()
+    {
+        /** @requires WordPress 3.1.0 */
+        add_filter('network_admin_plugin_action_links', [$this, 'filterPluginActions'], 10, 2);
+        add_filter('network_admin_plugin_action_links', [$this, 'startOutputBuffering'], 10, 2);
+
+        /**
+         * @requires WordPress 3.5.0
+         * @see \WP_List_Table::views() in wp-admin/includes/class-wp-list-table.php
+         */
         add_filter('views_plugins-network', [$this, 'addHiddenPluginsTab']);
         add_filter('views_plugins-network', [$this, 'fixTabs']);
     }
@@ -260,10 +269,13 @@ class HideMyPlugins
         // Magic starts here
         ob_start();
 
-        // The priority must be higher than priority (10) of
-        // wp_plugin_update_row(). See add_action() in function
-        // wp_plugin_update_rows() in wp-admin/includes/update.php
-        /** @requires WordPress 2.7.0 */
+        /**
+         * The priority must be higher than priority (10) of
+         * wp_plugin_update_row(). See add_action() in function
+         * wp_plugin_update_rows() in wp-admin/includes/update.php.
+         *
+         * @requires WordPress 2.7.0
+         */
         add_action("after_plugin_row_{$plugin}", [$this, 'endOutputBuffering'], 20, 1);
 
         return $filteredVar;
