@@ -4,7 +4,7 @@
  * Plugin Name: Hide My Plugins
  * Plugin URI: https://github.com/kapai1890/hide-my-plugins
  * Description: Hides plugins from the plugins list.
- * Version: 1.4.31
+ * Version: 1.4.32
  * Author: Biliavskyi Yevhen
  * Author URI: https://github.com/kapai1890
  * License: MIT
@@ -28,18 +28,18 @@ class HideMyPlugins
     protected $activeTab = 'all';
 
     /**
+     * Is on tab "All".
+     *
+     * @var bool
+     */
+    protected $isTabAll = true;
+
+    /**
      * Is on tab "Hidden".
      *
      * @var bool
      */
     protected $isTabHidden = false;
-
-    /**
-     * Is on tab "All" or "Hidden".
-     *
-     * @var bool
-     */
-    protected $isManageableTab = true;
 
     /**
      * The total amount of plugins.
@@ -81,8 +81,8 @@ class HideMyPlugins
         if (isset($_GET['plugin_status'])) {
             $this->activeTab = sanitize_text_field($_GET['plugin_status']);
 
-            $this->isTabHidden     = $this->activeTab == 'hidden';
-            $this->isManageableTab = $this->isTabHidden || $this->activeTab == 'all';
+            $this->isTabAll    = $this->activeTab == 'all';
+            $this->isTabHidden = $this->activeTab == 'hidden';
         }
 
         // No need to filter anything on AJAX calls
@@ -103,6 +103,12 @@ class HideMyPlugins
         /** @requires WordPress 3.0.0 */
         add_filter('all_plugins', [$this, 'countPlugins']);
 
+        /** @requires WordPress 3.5.0 */
+        add_filter('bulk_actions-plugins', [$this, 'addBulkActions']);
+
+        /** @requires WordPress 4.7.0 */
+        add_filter('handle_bulk_actions-plugins', [$this, 'doBulkAction'], 10, 3);
+
         /** @requires WordPress 2.5.0 */
         add_filter('plugin_action_links', [$this, 'filterPluginActions'], 10, 2);
         add_filter('plugin_action_links', [$this, 'startOutputBuffering'], 10, 2);
@@ -111,24 +117,24 @@ class HideMyPlugins
         add_action('admin_action_hide_my_plugin', [$this, 'onHidePlugin']);
         add_action('admin_action_unhide_my_plugin', [$this, 'onUnhidePlugin']);
 
-        /**
-         * @requires WordPress 3.5.0
-         * @see \WP_List_Table::views() in wp-admin/includes/class-wp-list-table.php
-         */
+        /** @requires WordPress 3.5.0 */
         add_filter('views_plugins', [$this, 'addHiddenPluginsTab']);
         add_filter('views_plugins', [$this, 'fixTabs']);
     }
 
     protected function addNetworkActions()
     {
+        /** @requires WordPress 3.5.0 */
+        add_filter('bulk_actions-plugins-network', [$this, 'addBulkActions']);
+
+        /** @requires WordPress 4.7.0 */
+        add_filter('handle_bulk_actions-plugins-network', [$this, 'doBulkAction'], 10, 3);
+
         /** @requires WordPress 3.1.0 */
         add_filter('network_admin_plugin_action_links', [$this, 'filterPluginActions'], 10, 2);
         add_filter('network_admin_plugin_action_links', [$this, 'startOutputBuffering'], 10, 2);
 
-        /**
-         * @requires WordPress 3.5.0
-         * @see \WP_List_Table::views() in wp-admin/includes/class-wp-list-table.php
-         */
+        /** @requires WordPress 3.5.0 */
         add_filter('views_plugins-network', [$this, 'addHiddenPluginsTab']);
         add_filter('views_plugins-network', [$this, 'fixTabs']);
     }
@@ -171,17 +177,13 @@ class HideMyPlugins
             && !empty($actionDone)
         ) {
             // We need to go back to the tab "Hidden"
-            $newQuery = [
-                'plugin_status' => 'hidden',
-                'paged'         => isset($_GET['paged']) ? absint($_GET['paged']) : 1,
-                's'             => isset($_GET['s']) ? sanitize_text_field($_GET['s']) : ''
-            ];
+            $redirectUrl = $this->pluginsRedirectUrl();
 
+            // Add action data
             foreach ($actionDone as $action) {
-                $newQuery[$action] = sanitize_text_field($_GET[$action]);
+                $redirectUrl = add_query_arg($action, sanitize_text_field($_GET[$action]), $redirectUrl);
             }
 
-            $redirectUrl = add_query_arg($newQuery, $this->adminUrl());
             wp_safe_redirect($redirectUrl);
 
             $this->selfDestruction(); // exit;
@@ -210,6 +212,64 @@ class HideMyPlugins
     }
 
     /**
+     * @param array $actions
+     * @return array
+     */
+    public function addBulkActions($actions)
+    {
+        if (!$this->isTabHidden) {
+            $actions['hide-selected'] = __('Hide', 'hide-my-plugins');
+        }
+
+        if (!$this->isTabAll) {
+            $actions['unhide-selected'] = __('Unhide', 'hide-my-plugins');
+        }
+
+        return $actions;
+    }
+
+    /**
+     * @param string|false $redirectUrl The redirect URL
+     * @param string $action "hide-selected"|"unhide-selected"
+     * @param array $plugins The plugins to take the action on.
+     * @return string|false
+     */
+    public function doBulkAction($redirectUrl, $action, $plugins)
+    {
+        if ($action != 'hide-selected' && $action != 'unhide-selected') {
+            return $redirectUrl;
+        }
+
+        $hiddenPlugins = $this->getHiddenPlugins();
+
+        switch ($action) {
+            case 'hide-selected':
+                foreach ($plugins as $pluginName) {
+                    if (!in_array($pluginName, $hiddenPlugins)) {
+                        $hiddenPlugins[] = $pluginName;
+                    }
+                }
+                break;
+
+            case 'unhide-selected':
+                foreach ($plugins as $pluginName) {
+                    $pluginIndex = array_search($pluginName, $hiddenPlugins);
+                    if ($pluginIndex !== false) {
+                        unset($hiddenPlugins[$pluginIndex]);
+                    }
+                }
+                $hiddenPlugins = array_values($hiddenPlugins); // Reset indexes after unset()
+                break;
+        }
+
+        $this->setHiddenPlugins($hiddenPlugins);
+
+        $redirectUrl = $this->pluginsRedirectUrl();
+
+        return $redirectUrl;
+    }
+
+    /**
      * <i>Hint. This method does not use context (tab name) of the filter
      * "plugin_action_links", because that context will be "all" on custom
      * tabs.</i>
@@ -223,8 +283,6 @@ class HideMyPlugins
      */
     public function filterPluginActions($actions, $plugin)
     {
-        global $page, $s; // Support current page number and search query
-
         if (!$this->userCanManagePlugins()) {
             return $actions;
         }
@@ -242,13 +300,10 @@ class HideMyPlugins
         // Build action URL
         $actionUrl = add_query_arg(
             [
-                'plugin_status' => $this->activeTab,
-                'paged'         => $page,
-                's'             => $s,
-                'action'        => $action,
-                'plugin'        => $plugin
+                'action' => $action,
+                'plugin' => $plugin
             ],
-            $this->adminUrl()
+            $this->pluginsRedirectUrl()
         );
 
         $actionUrl = wp_nonce_url($actionUrl, $nonceAction, 'hide_my_plugins_nonce');
@@ -290,7 +345,7 @@ class HideMyPlugins
 
         // Change the plugins list only on tabs "All" and "Hidden", show other
         // tabs without changes
-        if (!$this->isManageableTab
+        if (!$this->isTabAll && !$this->isTabHidden
             // Or is a proper plugin for current tab
             || $this->isHiddenPlugin($plugin) == $this->isTabHidden
         ) {
@@ -321,7 +376,7 @@ class HideMyPlugins
             return $views;
         }
 
-        $url  = add_query_arg('plugin_status', 'hidden', $this->adminUrl());
+        $url  = add_query_arg('plugin_status', 'hidden', $this->pluginsUrl());
         $atts = $this->isTabHidden ? ' class="current" aria-current="page"' : '';
 
         // Build tab text
@@ -431,13 +486,33 @@ class HideMyPlugins
     /**
      * @return string
      */
-    protected function adminUrl()
+    protected function pluginsUrl()
     {
         if (!is_network_admin()) {
             return admin_url('plugins.php');
         } else {
             return admin_url('network/plugins.php');
         }
+    }
+
+    protected function pluginsRedirectUrl()
+    {
+        $redirectUrl = $this->pluginsUrl();
+
+        if (!$this->isTabAll) {
+            $redirectUrl = add_query_arg('plugin_status', $this->activeTab, $redirectUrl);
+        }
+
+        if (isset($_GET['paged'])) {
+            $redirectUrl = add_query_arg('paged', absint($_GET['paged']), $redirectUrl);
+        }
+
+        if (isset($_GET['s'])) {
+            $search = urlencode(wp_unslash($_GET['s'])); // Like in wp-admin/plugins.php
+            $redirectUrl = add_query_arg('s', $search, $redirectUrl);
+        }
+
+        return $redirectUrl;
     }
 
     /**
