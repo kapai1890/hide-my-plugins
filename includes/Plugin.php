@@ -3,7 +3,8 @@
 namespace HideMyPlugins;
 
 /**
- * @requires WordPress 3.5.0 (to show the tab "Hidden")
+ * @requires WordPress 3.5.0+ (to show the tab "Hidden" and apply all fixes)
+ * @recommended WordPress 4.7.0+ (bulk actions)
  */
 class Plugin
 {
@@ -20,12 +21,10 @@ class Plugin
         add_action('init', [$this, 'loadTranslations']);
 
         require_once __DIR__ . '/functions.php';
-        require_once __DIR__ . '/modules/RedirectBack.php';
-
-        new RedirectBack();
-
         require_once __DIR__ . '/modules/PluginsScreen.php';
+        require_once __DIR__ . '/modules/FixRedirects.php';
         require_once __DIR__ . '/modules/FixTotals.php';
+        require_once __DIR__ . '/modules/FixPluginStatus.php';
         require_once __DIR__ . '/modules/TabHidden.php';
         require_once __DIR__ . '/modules/BulkActions.php';
         require_once __DIR__ . '/modules/PluginActions.php';
@@ -33,7 +32,10 @@ class Plugin
 
         $screen = new PluginsScreen();
 
+        new FixRedirects($screen);
         new FixTotals($screen);
+        new FixPluginStatus($screen);
+
         new TabHidden($screen);
         new BulkActions($screen);
         new PluginActions($screen);
