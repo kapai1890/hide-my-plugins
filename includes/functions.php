@@ -81,12 +81,18 @@ function plugins_sendback_url($tab = null)
 
     if (isset($_GET['paged'])) {
         $page = absint($_GET['paged']);
-        $redirectUrl = add_query_arg('paged', $page, $redirectUrl);
+
+        if ($page > 1) {
+            $redirectUrl = add_query_arg('paged', $page, $redirectUrl);
+        }
     }
 
     if (isset($_GET['s'])) {
         $search = urlencode(wp_unslash($_GET['s'])); // Like in wp-admin/plugins.php
-        $redirectUrl = add_query_arg('s', $search, $redirectUrl);
+
+        if (!empty($search)) {
+            $redirectUrl = add_query_arg('s', $search, $redirectUrl);
+        }
     }
 
     return $redirectUrl;
