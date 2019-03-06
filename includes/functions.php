@@ -7,10 +7,19 @@ namespace HideMyPlugins;
  */
 function get_hidden_plugins()
 {
-    if (!is_network_admin()) {
-        return get_option('my_hidden_plugins', []);
+    /** @required WordPress 3.0.0 */
+    $userId = get_current_user_id();
+
+    if ($userId > 0) {
+        /**
+         * @var string|array An array of hidden plugins or empty string, if
+         * there are no such meta.
+         */
+        $hiddenPlugins = get_user_meta($userId, 'my_hidden_plugins', true);
+
+        return is_array($hiddenPlugins) ? $hiddenPlugins : array();
     } else {
-        return get_site_option('my_hidden_plugins', []);
+        return array();
     }
 }
 
@@ -19,10 +28,11 @@ function get_hidden_plugins()
  */
 function set_hidden_plugins($plugins)
 {
-    if (!is_network_admin()) {
-        update_option('my_hidden_plugins', $plugins, false);
-    } else {
-        update_site_option('my_hidden_plugins', $plugins);
+    /** @required WordPress 3.0.0 */
+    $userId = get_current_user_id();
+
+    if ($userId > 0) {
+        update_user_meta($userId, 'my_hidden_plugins', $plugins);
     }
 }
 
