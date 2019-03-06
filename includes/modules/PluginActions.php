@@ -124,6 +124,8 @@ class PluginActions
         }
 
         set_hidden_plugins($hiddenPlugins);
+
+        $this->resetQueryArgs();
     }
 
     /**
@@ -148,5 +150,17 @@ class PluginActions
     protected function nonceAction($actionId, $pluginName)
     {
         return $actionId . '_' . $pluginName;
+    }
+
+    protected function resetQueryArgs()
+    {
+        wp_redirect(plugins_sendback_url());
+
+        $this->selfDestruction();
+    }
+
+    protected function selfDestruction()
+    {
+        exit(0);
     }
 }
