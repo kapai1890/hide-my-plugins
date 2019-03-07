@@ -26,6 +26,10 @@ class FilterPluginsList
         $this->screen = $screen;
 
         if (is_wp_version('2.7.0')) {
+            /** @requires WordPress 2.9.0 */
+            add_filter('plugins_per_page', [$this, 'forceSinglePage']);
+            add_filter('plugins_network_per_page', [$this, 'forceSinglePage']);
+
             /** @requires WordPress 2.5.0 */
             add_filter('plugin_action_links', [$this, 'startOutputBuffering'], 20, 2); // Run after the FixPluginStatus, so
                                                                                        // it will not filter our own actions
@@ -33,6 +37,15 @@ class FilterPluginsList
             /** @requires WordPress 3.1.0 */
             add_filter('network_admin_plugin_action_links', [$this, 'startOutputBuffering'], 20, 2);
         }
+    }
+
+    /**
+     * @param int $pluginsPerPage
+     * @return int
+     */
+    public function forceSinglePage($pluginsPerPage)
+    {
+        return 999;
     }
 
     /**
@@ -65,13 +78,10 @@ class FilterPluginsList
     {
         $output = ob_get_clean();
 
-        // Don't hide the plugin if the tab is neither "All", nor "Hidden"
-        if (!$this->screen->isOnTabAllOrHidden()
-            // Or is a proper plugin for current tab
-            || is_hidden_plugin($pluginName) == $this->screen->isOnTabHidden()
-        ) {
-            // Show current plugin
+        // Show the plugin if it's a proper plugin for current tab
+        if (is_hidden_plugin($pluginName) == $this->screen->isOnTabHidden()) {
             echo $output;
+
             $this->shownCount++;
         }
 
@@ -79,16 +89,7 @@ class FilterPluginsList
 
         // Show no-items message
         if ($this->processedCount == $this->screen->getPluginsCount() && $this->shownCount == 0) {
-            $this->noItems();
+            no_items();
         }
-    }
-
-    protected function noItems()
-    {
-        echo '<tr class="no-items">';
-            echo '<td class="colspanchange" colspan="3">';
-                _e('You do not appear to have any plugins available at this time.');
-            echo '</td>';
-        echo '</tr>';
     }
 }

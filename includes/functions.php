@@ -122,3 +122,12 @@ function is_wp_version($atLeast, $clean = false)
     $version = $clean ? preg_replace('/[^\d\.].*$/', '', $wp_version) : $wp_version;
     return version_compare($version, $atLeast, '>=');
 }
+
+function no_items()
+{
+    echo '<tr class="no-items">';
+        echo '<td class="colspanchange" colspan="3">';
+            _e('You do not appear to have any plugins available at this time.');
+        echo '</td>';
+    echo '</tr>';
+}

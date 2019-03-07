@@ -39,7 +39,10 @@ class Plugin
         new TabHidden($screen);
         new BulkActions($screen);
         new PluginActions($screen);
-        new FilterPluginsList($screen);
+
+        if ($screen->isOnTabAllOrHidden()) {
+            new FilterPluginsList($screen);
+        }
     }
 
     public function loadTranslations()
