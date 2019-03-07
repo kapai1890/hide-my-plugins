@@ -39,8 +39,12 @@ class FixPluginStatus
         /** @requires WordPress 3.1.0 */
         add_filter('network_admin_plugin_action_links', [$this, 'fixPluginActions']);
 
-        /** @requires WordPress 3.5.0 */
-        add_filter('views_plugins', [$this, 'fixFormStatus'], 20); // Run after the TabHidden
+        /**
+         * Run after the TabHidden.
+         *
+         * @requires WordPress 3.5.0
+         */
+        add_filter('views_plugins', [$this, 'fixFormStatus'], 20);
         add_filter('views_plugins-network', [$this, 'fixFormStatus'], 20);
     }
 

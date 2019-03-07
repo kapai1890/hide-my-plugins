@@ -17,17 +17,25 @@ class PluginActions
         $this->screen = $screen;
 
         if (is_wp_version('2.6.0')) {
-            /** @requires WordPress 2.5.0 */
-            add_filter('plugin_action_links', [$this, 'filterActions'], 20, 2); // Run after the FixPluginStatus, so
-                                                                                // it will not filter our own actions
-
-            /** @requires WordPress 3.1.0 */
-            add_filter('network_admin_plugin_action_links', [$this, 'filterActions'], 20, 2);
-
-            /** @requires WordPress 2.6.0 */
-            add_action('admin_action_hide_my_plugin', [$this, 'onHidePlugin']);
-            add_action('admin_action_unhide_my_plugin', [$this, 'onUnhidePlugin']);
+            /**
+             * Run after the FixPluginStatus, so it will not filter our own
+             * actions.
+             *
+             * @requires WordPress 2.5.0
+             */
+            add_filter('plugin_action_links', [$this, 'filterActions'], 20, 2);
         }
+
+        /**
+         * Run after the FixPluginStatus, so it will not filter our own actions.
+         *
+         * @requires WordPress 3.1.0
+         */
+        add_filter('network_admin_plugin_action_links', [$this, 'filterActions'], 20, 2);
+
+        /** @requires WordPress 2.6.0 */
+        add_action('admin_action_hide_my_plugin', [$this, 'onHidePlugin']);
+        add_action('admin_action_unhide_my_plugin', [$this, 'onUnhidePlugin']);
     }
 
     /**

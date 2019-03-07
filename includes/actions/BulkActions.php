@@ -18,11 +18,11 @@ class BulkActions
             /** @requires WordPress 3.5.0 */
             add_filter('bulk_actions-plugins', [$this, 'addActions']);
             add_filter('bulk_actions-plugins-network', [$this, 'addActions']);
-
-            /** @requires WordPress 4.7.0 */
-            add_filter('handle_bulk_actions-plugins', [$this, 'doAction'], 10, 3);
-            add_filter('handle_bulk_actions-plugins-network', [$this, 'doAction'], 10, 3);
         }
+
+        /** @requires WordPress 4.7.0 */
+        add_filter('handle_bulk_actions-plugins', [$this, 'doAction'], 10, 3);
+        add_filter('handle_bulk_actions-plugins-network', [$this, 'doAction'], 10, 3);
     }
 
     /**

@@ -25,18 +25,31 @@ class FilterPluginsList
     {
         $this->screen = $screen;
 
+        /**
+         * Current filter can break the multi-page listing. So force the
+         * WP_Plugins_List_Table to show all plugins on a single page.
+         *
+         * @requires WordPress 2.9.0
+         */
+        add_filter('plugins_per_page', [$this, 'forceSinglePage']);
+        add_filter('plugins_network_per_page', [$this, 'forceSinglePage']);
+
         if (is_wp_version('2.7.0')) {
-            /** @requires WordPress 2.9.0 */
-            add_filter('plugins_per_page', [$this, 'forceSinglePage']);
-            add_filter('plugins_network_per_page', [$this, 'forceSinglePage']);
-
-            /** @requires WordPress 2.5.0 */
-            add_filter('plugin_action_links', [$this, 'startOutputBuffering'], 20, 2); // Run after the FixPluginStatus, so
-                                                                                       // it will not filter our own actions
-
-            /** @requires WordPress 3.1.0 */
-            add_filter('network_admin_plugin_action_links', [$this, 'startOutputBuffering'], 20, 2);
+            /**
+             * Run after the FixPluginStatus, so it will not filter our own
+             * actions.
+             *
+             * @requires WordPress 2.5.0
+             */
+            add_filter('plugin_action_links', [$this, 'startOutputBuffering'], 20, 2);
         }
+
+        /**
+         * Run after the FixPluginStatus, so it will not filter our own actions.
+         *
+         * @requires WordPress 3.1.0
+         */
+        add_filter('network_admin_plugin_action_links', [$this, 'startOutputBuffering'], 20, 2);
     }
 
     /**

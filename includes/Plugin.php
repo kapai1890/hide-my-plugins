@@ -22,13 +22,13 @@ class Plugin
 
         require_once __DIR__ . '/functions.php';
         require_once __DIR__ . '/modules/PluginsScreen.php';
-        require_once __DIR__ . '/modules/FixRedirects.php';
-        require_once __DIR__ . '/modules/FixTotals.php';
-        require_once __DIR__ . '/modules/FixPluginStatus.php';
         require_once __DIR__ . '/modules/TabHidden.php';
-        require_once __DIR__ . '/modules/BulkActions.php';
-        require_once __DIR__ . '/modules/PluginActions.php';
-        require_once __DIR__ . '/modules/FilterPluginsList.php';
+        require_once __DIR__ . '/fixes/FixRedirects.php';
+        require_once __DIR__ . '/fixes/FixTotals.php';
+        require_once __DIR__ . '/fixes/FixPluginStatus.php';
+        require_once __DIR__ . '/actions/BulkActions.php';
+        require_once __DIR__ . '/actions/PluginActions.php';
+        require_once __DIR__ . '/filters/FilterPluginsList.php';
 
         $screen = new PluginsScreen();
 
@@ -37,9 +37,11 @@ class Plugin
         new FixPluginStatus($screen);
 
         new TabHidden($screen);
+
         new BulkActions($screen);
         new PluginActions($screen);
 
+        /** @todo Add more filters. Add support for multi-page listing. */
         if ($screen->isOnTabAllOrHidden()) {
             new FilterPluginsList($screen);
         }
