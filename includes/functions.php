@@ -17,9 +17,9 @@ function get_hidden_plugins()
          */
         $hiddenPlugins = get_user_meta($userId, 'my_hidden_plugins', true);
 
-        return is_array($hiddenPlugins) ? $hiddenPlugins : array();
+        return is_array($hiddenPlugins) ? $hiddenPlugins : [];
     } else {
-        return array();
+        return [];
     }
 }
 
