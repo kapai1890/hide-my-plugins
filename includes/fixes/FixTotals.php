@@ -14,6 +14,9 @@ class FixTotals
         /** @requires WordPress 3.5.0 */
         add_filter('views_plugins', [$this, 'fixAllCount']);
         add_filter('views_plugins-network', [$this, 'fixAllCount']);
+
+        /** @requires WordPress 2.8.0 */
+        add_action('admin_enqueue_scripts', [$this, 'fixDisplayingNumber']);
     }
 
     /**
@@ -35,5 +38,17 @@ class FixTotals
         }
 
         return $views;
+    }
+
+    public function fixDisplayingNumber()
+    {
+        if ($this->screen->isOnTabAllOrHidden() && $this->screen->getHiddenPluginsCount() > 0) {
+            wp_enqueue_script('hide-my-plugins-admin', PLUGIN_URL . 'assets/admin.js', array('jquery'), '2.0', true);
+
+            $pluginsCount = $this->screen->isOnTabAll() ? $this->screen->getVisiblePluginsCount() : $this->screen->getHiddenPluginsCount();
+            $fixedText = sprintf(_n('%s item', '%s items', $pluginsCount), number_format_i18n($pluginsCount));
+
+            wp_localize_script('hide-my-plugins-admin', 'HideMyPlugins', array('totalsFixedText' => $fixedText));
+        }
     }
 }

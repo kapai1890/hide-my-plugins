@@ -16,6 +16,8 @@ if (!defined('ABSPATH')) {
     exit('Press Enter to proceed...');
 }
 
+define('HideMyPlugins\PLUGIN_URL', plugin_dir_url(__FILE__));
+
 require_once __DIR__ . '/includes/Plugin.php';
 
 global $hideMyPlugins;
