@@ -36,8 +36,7 @@ class FilterPluginsList
 
         if (is_wp_version('2.7.0')) {
             /**
-             * Run after the FixPluginStatus, so it will not filter our own
-             * actions.
+             * Run after the FixPluginStatus and PluginActions.
              *
              * @requires WordPress 2.5.0
              */
@@ -45,7 +44,7 @@ class FilterPluginsList
         }
 
         /**
-         * Run after the FixPluginStatus, so it will not filter our own actions.
+         * Run after the FixPluginStatus and PluginActions.
          *
          * @requires WordPress 3.1.0
          */
