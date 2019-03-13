@@ -2,6 +2,9 @@
 
 namespace HideMyPlugins;
 
+/**
+ * @requires WordPress 3.0.0 for filter "all_plugins" (wp-admin/includes/class-wp-plugins-list-table.php)
+ */
 class PluginsScreen
 {
     const TAB_ALL     = 'all';
@@ -44,7 +47,7 @@ class PluginsScreen
             $this->activeTab = sanitize_text_field($_GET['plugin_status']);
         }
 
-        /** @requires WordPress 3.0.0 */
+        // Count all/visible/hidden plugins
         add_filter('all_plugins', [$this, 'countPlugins']);
     }
 

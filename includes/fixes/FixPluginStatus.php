@@ -21,6 +21,11 @@
 
 namespace HideMyPlugins;
 
+/**
+ * @requires WordPress 2.5.0 for filter "plugin_action_links" (wp-admin/includes/class-wp-plugins-list-table.php)
+ * @requires WordPress 3.1.0 for filter "network_admin_plugin_action_links" (wp-admin/includes/class-wp-plugins-list-table.php)
+ * @requires WordPress 3.5.0 for filter "views_{$this->screen->id}" (wp-admin/includes/class-wp-list-table.php)
+ */
 class FixPluginStatus
 {
     const TAB_ALL    = 'all';
@@ -33,17 +38,11 @@ class FixPluginStatus
     {
         $this->screen = $screen;
 
-        /** @requires WordPress 2.5.0 */
+        // Fix value of "plugin_status" in action URLs
         add_filter('plugin_action_links', [$this, 'fixPluginActions']);
-
-        /** @requires WordPress 3.1.0 */
         add_filter('network_admin_plugin_action_links', [$this, 'fixPluginActions']);
 
-        /**
-         * Run after the TabHidden.
-         *
-         * @requires WordPress 3.5.0
-         */
+        // Fix "plugin_status" in the form
         add_filter('views_plugins', [$this, 'fixFormStatus'], 20);
         add_filter('views_plugins-network', [$this, 'fixFormStatus'], 20);
     }

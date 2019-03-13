@@ -2,6 +2,9 @@
 
 namespace HideMyPlugins;
 
+/**
+ * @requires WordPress 2.1.0 for filter "wp_redirect" (wp-admin/plugins.php)
+ */
 class FixRedirects
 {
     const TAB_HIDDEN = 'hidden';
@@ -13,7 +16,7 @@ class FixRedirects
     {
         $this->screen = $screen;
 
-        /** @requires WordPress 2.1.0 */
+        // Redirect to the same tab
         add_filter('wp_redirect', [$this, 'fixRedirect']);
     }
 

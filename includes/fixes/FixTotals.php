@@ -2,6 +2,10 @@
 
 namespace HideMyPlugins;
 
+/**
+ * @requires WordPress 2.8.0 for action "admin_enqueue_scripts"
+ * @requires WordPress 3.5.0 for filter "views_{$this->screen->id}" (wp-admin/includes/class-wp-list-table.php)
+ */
 class FixTotals
 {
     /** @var PluginsScreen */
@@ -11,11 +15,11 @@ class FixTotals
     {
         $this->screen = $screen;
 
-        /** @requires WordPress 3.5.0 */
+        // Fix the number in "All (%d)"
         add_filter('views_plugins', [$this, 'fixAllCount']);
         add_filter('views_plugins-network', [$this, 'fixAllCount']);
 
-        /** @requires WordPress 2.8.0 */
+        // Fix the number in "%d items"
         add_action('admin_enqueue_scripts', [$this, 'fixDisplayingNumber']);
     }
 

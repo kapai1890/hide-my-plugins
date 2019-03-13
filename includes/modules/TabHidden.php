@@ -2,6 +2,9 @@
 
 namespace HideMyPlugins;
 
+/**
+ * @requires WordPress 3.5.0 for filter "views_{$this->screen->id}" (wp-admin/includes/class-wp-list-table.php)
+ */
 class TabHidden
 {
     const TAB_HIDDEN = 'hidden';
@@ -13,7 +16,7 @@ class TabHidden
     {
         $this->screen = $screen;
 
-        /** @requires WordPress 3.5.0 */
+        // Add tab "Hidden"
         add_filter('views_plugins', [$this, 'addTab']);
         add_filter('views_plugins-network', [$this, 'addTab']);
     }

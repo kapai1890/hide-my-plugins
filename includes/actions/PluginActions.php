@@ -26,6 +26,7 @@ class PluginActions
         add_filter('plugin_action_links', [$this, 'addAction'], 20, 2);
         add_filter('network_admin_plugin_action_links', [$this, 'addAction'], 20, 2);
 
+        // Do actions
         add_action('admin_action_hide_my_plugin', [$this, 'onHidePlugin']);
         add_action('admin_action_unhide_my_plugin', [$this, 'onUnhidePlugin']);
     }
