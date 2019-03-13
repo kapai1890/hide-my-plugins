@@ -10,7 +10,7 @@ class Plugin
 {
     public function __construct()
     {
-        if ($this->isPluginsPage() && !$this->isAjax()) {
+        if ($this->isPluginsPage() && !$this->isAjax() && $this->isSupportedVersion()) {
             $this->load();
         }
     }
@@ -69,5 +69,11 @@ class Plugin
         $script = $_SERVER['SCRIPT_NAME'];
 
         return $script == '/wp-admin/plugins.php' || $script == '/wp-admin/network/plugins.php';
+    }
+
+    protected function isSupportedVersion()
+    {
+        global $wp_version;
+        return version_compare($wp_version, '3.5.0', '>=');
     }
 }

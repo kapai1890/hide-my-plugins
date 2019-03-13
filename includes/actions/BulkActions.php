@@ -2,6 +2,10 @@
 
 namespace HideMyPlugins;
 
+/**
+ * @requires WordPress 3.5.0 for filter "bulk_actions-{$this->screen->id}" (wp-admin/includes/class-wp-list-table.php)
+ * @requires WordPress 4.7.0 for filter "handle_bulk_actions-{$screen->id}" (wp-admin/plugins.php)
+ */
 class BulkActions
 {
     const ACTION_HIDE   = 'hide-selected';
@@ -14,13 +18,16 @@ class BulkActions
     {
         $this->screen = $screen;
 
-        if (is_wp_version('4.7.0')) {
-            /** @requires WordPress 3.5.0 */
-            add_filter('bulk_actions-plugins', [$this, 'addActions']);
-            add_filter('bulk_actions-plugins-network', [$this, 'addActions']);
+        // We can handle custom bulk actions only since WordPress 4.7.0
+        if (!is_wp_version('4.7.0')) {
+            return;
         }
 
-        /** @requires WordPress 4.7.0 */
+        // Add bulk actions
+        add_filter('bulk_actions-plugins', [$this, 'addActions']);
+        add_filter('bulk_actions-plugins-network', [$this, 'addActions']);
+
+        // Handle bulk actions
         add_filter('handle_bulk_actions-plugins', [$this, 'doAction'], 10, 3);
         add_filter('handle_bulk_actions-plugins-network', [$this, 'doAction'], 10, 3);
     }

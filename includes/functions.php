@@ -110,17 +110,14 @@ function plugins_sendback_url($tab = null)
 
 /**
  * @param string $atLeast
- * @param bool $clean Optional. False by default.
  * @return bool
  *
  * @global string $wp_version
  */
-function is_wp_version($atLeast, $clean = false)
+function is_wp_version($atLeast)
 {
     global $wp_version;
-
-    $version = $clean ? preg_replace('/[^\d\.].*$/', '', $wp_version) : $wp_version;
-    return version_compare($version, $atLeast, '>=');
+    return version_compare($wp_version, $atLeast, '>=');
 }
 
 function no_items()
