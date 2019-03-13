@@ -40,7 +40,7 @@ class FilterPluginsList
              *
              * @requires WordPress 2.5.0
              */
-            add_filter('plugin_action_links', [$this, 'startOutputBuffering'], 20, 2);
+            add_filter('plugin_action_links', [$this, 'startOutputBuffering'], 30, 2);
         }
 
         /**
@@ -48,7 +48,7 @@ class FilterPluginsList
          *
          * @requires WordPress 3.1.0
          */
-        add_filter('network_admin_plugin_action_links', [$this, 'startOutputBuffering'], 20, 2);
+        add_filter('network_admin_plugin_action_links', [$this, 'startOutputBuffering'], 30, 2);
     }
 
     /**
