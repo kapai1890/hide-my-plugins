@@ -40,6 +40,7 @@ class TabHidden
         $atts = $isCurrentTab ? ' class="current" aria-current="page"' : '';
 
         // Build tab text
+        // translators: Hidden <span>(11)</span>
         $text = sprintf(__('Hidden %s', 'hide-my-plugins'), '<span class="count">(%s)</span>');
         $text = sprintf($text, number_format_i18n($hiddenPluginsCount));
 
