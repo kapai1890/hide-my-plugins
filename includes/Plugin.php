@@ -41,7 +41,6 @@ class Plugin
         new BulkActions($screen);
         new PluginActions($screen);
 
-        /** @todo Add more filters. Add support for multi-page listing. */
         if ($screen->isOnTabAllOrHidden()) {
             new FilterPluginsList($screen);
         }

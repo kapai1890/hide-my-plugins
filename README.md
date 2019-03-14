@@ -9,7 +9,7 @@ Decrease the amount of plugins, which you don't manage often. Move the hidden pl
 
 ## Tested Up To
 * PHP 7.0.15
-* WordPress 5.2
+* WordPress 5.1.1
 
 ## Some Details
 * Hides plugins immediately.
