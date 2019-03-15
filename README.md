@@ -11,8 +11,8 @@ Decrease the amount of plugins, which you don't manage often. Move the hidden pl
 * Supports network installations.
 
 # Requirements
-* PHP 5.4+
-* WordPress 3.5.0+
+* PHP 5.4
+* WordPress 4.7.0
 
 ## Tested Up To
 * PHP 7.0.15
