@@ -108,18 +108,6 @@ function plugins_sendback_url($tab = null)
     return $redirectUrl;
 }
 
-/**
- * @param string $atLeast
- * @return bool
- *
- * @global string $wp_version
- */
-function is_wp_version($atLeast)
-{
-    global $wp_version;
-    return version_compare($wp_version, $atLeast, '>=');
-}
-
 function no_items()
 {
     echo '<tr class="no-items">';

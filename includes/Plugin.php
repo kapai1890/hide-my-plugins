@@ -3,14 +3,17 @@
 namespace HideMyPlugins;
 
 /**
- * @requires WordPress 3.5.0+ (to show the tab "Hidden" and apply all fixes)
- * @recommended WordPress 4.7.0+ (bulk actions)
+ * Main required WordPress versions: 3.5.0 (to show the tab "Hidden" and apply
+ * all fixes) and 4.7.0 (better translations support, handle custom bulk
+ * actions, new functions).
+ *
+ * @requires WordPress 4.7.0
  */
 class Plugin
 {
     public function __construct()
     {
-        if ($this->isPluginsPage() && !$this->isAjax() && $this->isSupportedVersion()) {
+        if ($this->isPluginsPage() && !wp_doing_ajax() && $this->isWpVersion('4.7.0')) {
             $this->load();
         }
     }
@@ -48,12 +51,15 @@ class Plugin
 
     public function loadTranslations()
     {
-        load_plugin_textdomain('hide-my-plugins', false, 'hide-my-plugins/languages');
-    }
+        $domain = $slug = 'hide-my-plugins';
 
-    protected function isAjax()
-    {
-        return defined('DOING_AJAX') && DOING_AJAX;
+        load_plugin_textdomain($domain, false, "{$slug}/languages");
+
+        // Load user translations
+        $locale = apply_filters('plugin_locale', get_user_locale(), $domain);
+        $mofile = WP_LANG_DIR . "/{$slug}/{$slug}-{$locale}.mo";
+
+        load_textdomain($domain, $mofile);
     }
 
     protected function isPluginsPage()
@@ -70,9 +76,15 @@ class Plugin
         return $script == '/wp-admin/plugins.php' || $script == '/wp-admin/network/plugins.php';
     }
 
-    protected function isSupportedVersion()
+    /**
+     * @param string $atLeast
+     * @return bool
+     *
+     * @global string $wp_version
+     */
+    protected function isWpVersion($atLeast)
     {
         global $wp_version;
-        return version_compare($wp_version, '3.5.0', '>=');
+        return version_compare($wp_version, $atLeast, '>=');
     }
 }

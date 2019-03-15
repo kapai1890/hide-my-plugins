@@ -18,11 +18,6 @@ class BulkActions
     {
         $this->screen = $screen;
 
-        // We can handle custom bulk actions only since WordPress 4.7.0
-        if (!is_wp_version('4.7.0')) {
-            return;
-        }
-
         // Add bulk actions
         add_filter('bulk_actions-plugins', [$this, 'addActions']);
         add_filter('bulk_actions-plugins-network', [$this, 'addActions']);
