@@ -7,8 +7,8 @@ Decrease the amount of plugins, which you don't manage often. Move the hidden pl
 * Hides plugins immediately.
 * Hides plugins only for current user.
 * Any users with capability to activate or manage plugins can hide or show the plugins.
-* Supports network installations.
 * Will not hide itself by default. You can hide the plugin like any other.
+* Supports network installations.
 
 # Requirements
 * PHP 5.4+
