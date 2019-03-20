@@ -51,15 +51,7 @@ class Plugin
 
     public function loadTranslations()
     {
-        $domain = $slug = 'hide-my-plugins';
-
-        load_plugin_textdomain($domain, false, "{$slug}/languages");
-
-        // Load user translations
-        $locale = apply_filters('plugin_locale', get_user_locale(), $domain);
-        $mofile = WP_LANG_DIR . "/{$slug}/{$slug}-{$locale}.mo";
-
-        load_textdomain($domain, $mofile);
+        load_plugin_textdomain('hide-my-plugins', false, "hide-my-plugins/languages");
     }
 
     protected function isPluginsPage()
