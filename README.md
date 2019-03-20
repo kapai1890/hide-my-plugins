@@ -1,21 +1,22 @@
-# Hide Plugins \[P\]
-WordPress plugin that allows to hide plugins from the plugins list.
+# Hide My Plugins \[P\]
+Hides unnecessary plugins from the plugins list.
 
-## Requirements
-* PHP 7.0+
-* WordPress 3.5.0+
+Decrease the amount of plugins, which you don't manage often. Move the hidden plugin into the tab "Hidden", where you can switch back to show the plugin again, if you change your mind.
 
-## Description
-The plugin is intended only for individual sites and WILL NOT support network plugins. If you want to hide network plugins, you can use such plugins, as [Hide Plugins (by brianmiyaji)](https://wordpress.org/plugins/hide-plugins/).
+## Features
+* Hides plugins immediately.
+* Hides plugins only for current user.
+* Any users with capability to activate or manage plugins can hide or show the plugins.
+* Will not hide itself by default. You can hide the plugin like any other.
+* Supports network installations.
 
-Compared to [brianmiyaji's Hide Plugins v1.0.4](https://wordpress.org/plugins/hide-plugins/):
-* hides plugins immediately and for all users (moves to tab "Hidden");
-* any administrator (users with "delete_plugins" capability) can hide or show plugins;
-* will not hide itself by default, you can hide the plugin like any others;
-* does not support network plugins;
-* adds "Hidden" tab on "Plugins" page, where you can disable hiding of the plugins.
+# Requirements
+* PHP 5.4
+* WordPress 4.7.0
 
-_The plugin does not conflict with [brianmiyaji's Hide Plugins](https://wordpress.org/plugins/hide-plugins/)._
+## Tested Up To
+* PHP 7.0.15
+* WordPress 5.1.1
 
 # License
 The project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
