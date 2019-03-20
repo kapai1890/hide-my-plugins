@@ -112,7 +112,7 @@ function no_items()
 {
     echo '<tr class="no-items">';
         echo '<td class="colspanchange" colspan="3">';
-            _e('You do not appear to have any plugins available at this time.');
+            esc_html_e('You do not appear to have any plugins available at this time.');
         echo '</td>';
     echo '</tr>';
 }
