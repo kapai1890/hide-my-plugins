@@ -51,7 +51,7 @@ class Plugin
 
     public function loadTranslations()
     {
-        load_plugin_textdomain('hide-my-plugins', false, "hide-my-plugins/languages");
+        load_plugin_textdomain('hide-my-plugins', false, 'hide-my-plugins/languages');
     }
 
     protected function isPluginsPage()

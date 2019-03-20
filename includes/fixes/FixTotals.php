@@ -50,7 +50,9 @@ class FixTotals
             wp_enqueue_script('hide-my-plugins-admin', PLUGIN_URL . 'assets/admin.js', array('jquery'), '2.0', true);
 
             $pluginsCount = $this->screen->isOnTabAll() ? $this->screen->getVisiblePluginsCount() : $this->screen->getHiddenPluginsCount();
-            $fixedText = sprintf(_n('%s item', '%s items', $pluginsCount), number_format_i18n($pluginsCount));
+
+            $fixedText = esc_html(_n('%s item', '%s items', $pluginsCount));
+            $fixedText = sprintf($fixedText, number_format_i18n($pluginsCount));
 
             wp_localize_script('hide-my-plugins-admin', 'HideMyPlugins', array('totalsFixedText' => $fixedText));
         }
