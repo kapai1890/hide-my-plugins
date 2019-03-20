@@ -52,7 +52,7 @@ class PluginActions
         }
 
         $isHidden   = is_hidden_plugin($pluginName);
-        $actionText = $isHidden ? __('Unhide', 'hide-my-plugins') : __('Hide', 'hide-my-plugins');
+        $actionText = $isHidden ? esc_html__('Unhide', 'hide-my-plugins') : esc_html__('Hide', 'hide-my-plugins');
         $actionId   = $isHidden ? self::ACTION_UNHIDE : self::ACTION_HIDE;
 
         // Build action URL

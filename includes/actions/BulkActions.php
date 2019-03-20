@@ -34,11 +34,11 @@ class BulkActions
     public function addActions($actions)
     {
         if (!$this->screen->isOnTabHidden()) {
-            $actions[self::ACTION_HIDE] = __('Hide', 'hide-my-plugins');
+            $actions[self::ACTION_HIDE] = esc_html__('Hide', 'hide-my-plugins');
         }
 
         if (!$this->screen->isOnTabAll()) {
-            $actions[self::ACTION_UNHIDE] = __('Unhide', 'hide-my-plugins');
+            $actions[self::ACTION_UNHIDE] = esc_html__('Unhide', 'hide-my-plugins');
         }
 
         return $actions;

@@ -41,7 +41,7 @@ class TabHidden
 
         // Build tab text
         // translators: Hidden <span>(11)</span>
-        $text = sprintf(__('Hidden %s', 'hide-my-plugins'), '<span class="count">(%s)</span>');
+        $text = sprintf(esc_html__('Hidden %s', 'hide-my-plugins'), '<span class="count">(%s)</span>');
         $text = sprintf($text, number_format_i18n($hiddenPluginsCount));
 
         // See "<a href..." in \WP_Plugins_List_Table::get_views() in
