@@ -3,10 +3,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Hide My Plugins 2.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/hide-my-"
-"plugins\n"
-"POT-Creation-Date: 2019-03-14 22:38+0200\n"
-"PO-Revision-Date: 2019-03-15 15:06+0200\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/hide-my-plugins\n"
+"POT-Creation-Date: 2019-03-25 23:43+0200\n"
+"PO-Revision-Date: 2019-03-25 23:44+0200\n"
 "Last-Translator: Yevhen <kapai1890@gmail.com>\n"
 "Language-Team: \n"
 "Language: uk_UA\n"
@@ -38,11 +37,11 @@ msgstr "Білявський Євген"
 msgid "https://github.com/kapai1890"
 msgstr "https://github.com/kapai1890"
 
-#: includes/actions/BulkActions.php:42 includes/actions/PluginActions.php:55
+#: includes/actions/BulkActions.php:37 includes/actions/PluginActions.php:55
 msgid "Hide"
 msgstr "Приховати"
 
-#: includes/actions/BulkActions.php:46 includes/actions/PluginActions.php:55
+#: includes/actions/BulkActions.php:41 includes/actions/PluginActions.php:55
 msgid "Unhide"
 msgstr "Показати"
 
@@ -50,3 +49,13 @@ msgstr "Показати"
 #: includes/modules/TabHidden.php:44
 msgid "Hidden %s"
 msgstr "Приховані %s"
+
+#. translators: %1$s: PHP version; %2$s: WordPress version
+#: hide-my-plugins.php:32
+#, fuzzy
+msgid ""
+"Hide My Plugins requires PHP version %1$s+ and WordPress version %2$s+, and "
+"cannot run in the current environment."
+msgstr ""
+"Hide My Plugins потребує PHP версію %1$s+ і WordPress версію %2$s+, і не "
+"може працювати в поточному середовищі."
