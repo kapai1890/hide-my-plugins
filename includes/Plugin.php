@@ -9,18 +9,20 @@ namespace HideMyPlugins;
  *
  * @requires WordPress 4.7.0
  */
-class Plugin
+final class Plugin
 {
-    public function __construct()
+    /** @var Plugin */
+    private static $instance = null;
+
+    private function __construct()
     {
-        if ($this->isPluginsPage() && !wp_doing_ajax() && $this->isWpVersion('4.7.0')) {
+        if ($this->isPluginsPage() && !wp_doing_ajax()) {
             $this->load();
         }
     }
 
     public function load()
     {
-        /** @requires WordPress 1.5 */
         add_action('init', [$this, 'loadTranslations']);
 
         require_once __DIR__ . '/functions.php';
@@ -51,7 +53,8 @@ class Plugin
 
     public function loadTranslations()
     {
-        load_plugin_textdomain('hide-my-plugins', false, 'hide-my-plugins/languages');
+        $pluginDir = plugin_basename(PLUGIN_DIR); // "hide-my-plugins" or renamed name
+        load_plugin_textdomain('hide-my-plugins', false, $pluginDir . '/languages');
     }
 
     protected function isPluginsPage()
@@ -68,15 +71,12 @@ class Plugin
         return $script == '/wp-admin/plugins.php' || $script == '/wp-admin/network/plugins.php';
     }
 
-    /**
-     * @param string $atLeast
-     * @return bool
-     *
-     * @global string $wp_version
-     */
-    protected function isWpVersion($atLeast)
+    public static function getInstance()
     {
-        global $wp_version;
-        return version_compare($wp_version, $atLeast, '>=');
+        if (is_null(self::$instance)) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
     }
 }

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2019-03-14T22:36:15+02:00\n"
+"POT-Creation-Date: 2019-03-25T23:40:07+02:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.1.0\n"
 "X-Domain: hide-my-plugins\n"
@@ -34,12 +34,12 @@ msgstr ""
 msgid "https://github.com/kapai1890"
 msgstr ""
 
-#: includes/actions/BulkActions.php:42
+#: includes/actions/BulkActions.php:37
 #: includes/actions/PluginActions.php:55
 msgid "Hide"
 msgstr ""
 
-#: includes/actions/BulkActions.php:46
+#: includes/actions/BulkActions.php:41
 #: includes/actions/PluginActions.php:55
 msgid "Unhide"
 msgstr ""
@@ -47,4 +47,9 @@ msgstr ""
 #. translators: Hidden <span>(11)</span>
 #: includes/modules/TabHidden.php:44
 msgid "Hidden %s"
+msgstr ""
+
+#. translators: %1$s: PHP version; %2$s: WordPress version
+#: hide-my-plugins.php:32
+msgid "Hide My Plugins requires PHP version %1$s+ and WordPress version %2$s+, and cannot run in the current environment."
 msgstr ""
