@@ -22,9 +22,9 @@
 namespace HideMyPlugins;
 
 /**
- * @requires WordPress 2.5.0 for filter "plugin_action_links" (wp-admin/includes/class-wp-plugins-list-table.php)
- * @requires WordPress 3.1.0 for filter "network_admin_plugin_action_links" (wp-admin/includes/class-wp-plugins-list-table.php)
- * @requires WordPress 3.5.0 for filter "views_{$this->screen->id}" (wp-admin/includes/class-wp-list-table.php)
+ * @requires WordPress 2.5 for filter "plugin_action_links" (wp-admin/includes/class-wp-plugins-list-table.php)
+ * @requires WordPress 3.1 for filter "network_admin_plugin_action_links" (wp-admin/includes/class-wp-plugins-list-table.php)
+ * @requires WordPress 3.5 for filter "views_{$this->screen->id}" (wp-admin/includes/class-wp-list-table.php)
  */
 class FixPluginStatus
 {

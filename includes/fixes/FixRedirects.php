@@ -3,7 +3,7 @@
 namespace HideMyPlugins;
 
 /**
- * @requires WordPress 2.1.0 for filter "wp_redirect" (wp-admin/plugins.php)
+ * @requires WordPress 2.1 for filter "wp_redirect" (wp-admin/plugins.php)
  */
 class FixRedirects
 {

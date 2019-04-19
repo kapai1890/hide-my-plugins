@@ -2,14 +2,7 @@
 
 namespace HideMyPlugins;
 
-/**
- * Main required WordPress versions: 3.5.0 (to show the tab "Hidden" and apply
- * all fixes) and 4.7.0 (better translations support, handle custom bulk
- * actions, new functions).
- *
- * @requires WordPress 4.7.0
- */
-final class Plugin
+class Plugin
 {
     /** @var Plugin */
     private static $instance = null;

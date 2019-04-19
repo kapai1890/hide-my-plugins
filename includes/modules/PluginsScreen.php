@@ -3,7 +3,7 @@
 namespace HideMyPlugins;
 
 /**
- * @requires WordPress 3.0.0 for filter "all_plugins" (wp-admin/includes/class-wp-plugins-list-table.php)
+ * @requires WordPress 3.0 for filter "all_plugins" (wp-admin/includes/class-wp-plugins-list-table.php)
  */
 class PluginsScreen
 {
