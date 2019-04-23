@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hide My Plugins 2.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/hide-my-plugins\n"
-"POT-Creation-Date: 2019-03-25 23:41+0200\n"
-"PO-Revision-Date: 2019-03-25 23:43+0200\n"
-"Last-Translator: Yevhen <kapai1890@gmail.com>\n"
+"POT-Creation-Date: 2019-04-23 23:23+0300\n"
+"PO-Revision-Date: 2019-04-23 23:23+0300\n"
+"Last-Translator: Biliavskyi Yevhen\n"
 "Language-Team: \n"
 "Language: uk_UA\n"
 "MIME-Version: 1.0\n"
@@ -22,8 +22,8 @@ msgid "Hide My Plugins"
 msgstr "Hide My Plugins"
 
 #. Plugin URI of the plugin
-msgid "https://github.com/kapai1890/hide-my-plugins"
-msgstr "https://github.com/kapai1890/hide-my-plugins"
+msgid "https://github.com/biliavskyi.yevhen/hide-my-plugins"
+msgstr "https://github.com/biliavskyi.yevhen/hide-my-plugins"
 
 #. Description of the plugin
 msgid "Hides plugins from the plugins list."
@@ -34,8 +34,8 @@ msgid "Biliavskyi Yevhen"
 msgstr "Білявський Євген"
 
 #. Author URI of the plugin
-msgid "https://github.com/kapai1890"
-msgstr "https://github.com/kapai1890"
+msgid "https://github.com/biliavskyi.yevhen"
+msgstr "https://github.com/biliavskyi.yevhen"
 
 #: includes/actions/BulkActions.php:37 includes/actions/PluginActions.php:55
 msgid "Hide"
