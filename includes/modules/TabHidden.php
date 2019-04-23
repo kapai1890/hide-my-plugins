@@ -3,7 +3,7 @@
 namespace HideMyPlugins;
 
 /**
- * @requires WordPress 3.5.0 for filter "views_{$this->screen->id}" (wp-admin/includes/class-wp-list-table.php)
+ * @requires WordPress 3.5 for filter "views_{$this->screen->id}" (wp-admin/includes/class-wp-list-table.php)
  */
 class TabHidden
 {

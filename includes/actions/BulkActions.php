@@ -3,8 +3,8 @@
 namespace HideMyPlugins;
 
 /**
- * @requires WordPress 3.5.0 for filter "bulk_actions-{$this->screen->id}" (wp-admin/includes/class-wp-list-table.php)
- * @requires WordPress 4.7.0 for filter "handle_bulk_actions-{$screen->id}" (wp-admin/plugins.php)
+ * @requires WordPress 3.5 for filter "bulk_actions-{$this->screen->id}" (wp-admin/includes/class-wp-list-table.php)
+ * @requires WordPress 4.7 for filter "handle_bulk_actions-{$screen->id}" (wp-admin/plugins.php)
  */
 class BulkActions
 {

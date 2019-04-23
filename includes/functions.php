@@ -7,7 +7,6 @@ namespace HideMyPlugins;
  */
 function get_hidden_plugins()
 {
-    /** @requires WordPress 3.0.0 */
     $userId = get_current_user_id();
 
     if ($userId > 0) {
@@ -28,7 +27,6 @@ function get_hidden_plugins()
  */
 function set_hidden_plugins($plugins)
 {
-    /** @requires WordPress 3.0.0 */
     $userId = get_current_user_id();
 
     if ($userId > 0) {

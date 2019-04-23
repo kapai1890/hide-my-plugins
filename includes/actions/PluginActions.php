@@ -3,9 +3,9 @@
 namespace HideMyPlugins;
 
 /**
- * @requires WordPress 2.5.0 for filter "plugin_action_links" (wp-admin/includes/class-wp-plugins-list-table.php)
- * @requires WordPress 2.6.0 for action "admin_action_{$_REQUEST['action']}" (wp-admin/admin.php)
- * @requires WordPress 3.1.0 for filter "network_admin_plugin_action_links" (wp-admin/includes/class-wp-plugins-list-table.php)
+ * @requires WordPress 2.5 for filter "plugin_action_links" (wp-admin/includes/class-wp-plugins-list-table.php)
+ * @requires WordPress 2.6 for action "admin_action_{$_REQUEST['action']}" (wp-admin/admin.php)
+ * @requires WordPress 3.1 for filter "network_admin_plugin_action_links" (wp-admin/includes/class-wp-plugins-list-table.php)
  */
 class PluginActions
 {
